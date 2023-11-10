@@ -5,6 +5,7 @@ using BepInEx.Logging;
 using GameNetcodeStuff;
 using HarmonyLib;
 using MikesTweaks.Scripts.Inventory;
+using MikesTweaks.Scripts.Player;
 using UnityEngine.UIElements.Internal;
 
 namespace MikesTweaks
@@ -24,8 +25,10 @@ namespace MikesTweaks
             Logger.LogInfo($"Plugin {PluginGUID} is loaded!");
 
             Harmony harmony = new Harmony(PluginGUID);
-            InventoryTweaks.RegisterPatches(harmony);
             InventoryTweaks.RegisterConfigs(Config);
+            InventoryTweaks.RegisterPatches(harmony);
+            PlayerTweaks.RegisterConfigs(Config);
+            PlayerTweaks.RegisterPatches(harmony);
         }
     }
 }
