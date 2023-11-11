@@ -17,7 +17,7 @@ namespace MikesTweaks.Scripts
     {
         public const string PluginGUID = "mikes.lethalcompany.mikestweaks";
         public const string PluginName = "Mike's Tweaks";
-        public const string PluginVersion = "1.2.1";
+        public const string PluginVersion = "1.2.2";
         public static ManualLogSource Log = null;
 
         private void Awake()
