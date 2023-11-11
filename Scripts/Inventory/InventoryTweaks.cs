@@ -36,7 +36,8 @@ namespace MikesTweaks.Scripts.Inventory
                     {"TZPInhalant", new ConfigEntrySettings<int>("TZPInhalant", 0, 0)},
                     {"ZapGun", new ConfigEntrySettings<int>("ZapGun", 4, 10)},
                     {"Jetpack", new ConfigEntrySettings<int>("Jetpack", 10, 50)},
-                    {"ExtensionLadder", new ConfigEntrySettings<int>("ExtensionLadder", 0, 0)}
+                    {"ExtensionLadder", new ConfigEntrySettings<int>("ExtensionLadder", 0, 0)},
+                    {"RadarBooster", new ConfigEntrySettings<int>("RadarBooster", 5, 18)}
                 };
 
         }
