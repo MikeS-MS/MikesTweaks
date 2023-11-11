@@ -15,30 +15,22 @@ namespace MikesTweaks.Scripts.Player
         {
             public static string PlayerTweaksSectionHeader => "PlayerTweaks";
 
-            public static float SprintLongevityDefaultValue => 12f;
-            public static string SprintLongevityConfigName => "SprintLongevity";
-            public static string SprintLongevityConfigDesc => "Higher Values increase the time allowed to sprint\nVanilla Default: 5f";
-            public static ConfigEntry<float> SprintLongevityValue = null;
-        }
-
-        public static void RegisterPatches(Harmony harmony)
-        {
-            MethodInfo PlayerControllerB_Awake = AccessTools.Method(typeof(PlayerControllerB), "Awake");
-            MethodInfo PlayerControllerB_PostAwakeMethod = AccessTools.Method(typeof(PlayerTweaks), "ModifySprintLongevity");
-
-            harmony.Patch(PlayerControllerB_Awake, null, new HarmonyMethod(PlayerControllerB_PostAwakeMethod));
+            public static readonly ConfigEntrySettings<float> SprintLongevity =
+                new ConfigEntrySettings<float>("SprintLongevity", 12, 5);
         }
 
         public static void RegisterConfigs(ConfigFile config)
         {
-            Configs.SprintLongevityValue = config.Bind(Configs.PlayerTweaksSectionHeader,
-                Configs.SprintLongevityConfigName, Configs.SprintLongevityDefaultValue,
-                Configs.SprintLongevityConfigDesc);
+            Configs.SprintLongevity.Entry = config.Bind(Configs.PlayerTweaksSectionHeader,
+                Configs.SprintLongevity.ConfigName, Configs.SprintLongevity.DefaultValue,
+                Configs.SprintLongevity.ConfigDesc);
         }
 
+        [HarmonyPatch(typeof(PlayerControllerB), "Awake")]
+        [HarmonyPostfix]
         private static void ModifySprintLongevity(PlayerControllerB __instance)
         {
-            __instance.sprintTime = Configs.SprintLongevityValue.Value;
+            __instance.sprintTime = Configs.SprintLongevity.Value;
         }
     }
 }

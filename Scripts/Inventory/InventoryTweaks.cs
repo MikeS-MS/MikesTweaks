@@ -12,83 +12,55 @@ using Object = UnityEngine.Object;
 
 namespace MikesTweaks.Scripts.Inventory
 {
-
-
     public class InventoryTweaks
     {
-        private class ItemConfigEntry
-        {
-            public ItemConfigEntry(int defaultWeightCost, int vanillaWeightCost)
-            {
-                DefaultWeightCost = defaultWeightCost;
-                VanillaWeightCost = vanillaWeightCost;
-            }
-
-            private readonly int VanillaWeightCost = 0;
-            public int DefaultWeightCost { get; private set; }
-            public string ConfigDesc => $"Vanilla Default: {VanillaWeightCost} lb";
-            public ConfigEntry<int> WeightCost;
-
-        }
 
         private static class Configs
         {
             public static string InventoryTweaksSectionHeader => "InventoryTweaks";
 
-            public static string ExtraItemSlotsAmountConfigName => "ExtraItemSlots";
-            public static string ExtraItemSlotsAmountConfigDesc => "Vanilla Default: 0 slots";
-            public static ConfigEntry<int> ExtraItemSlotsAmount { get; set; }
+            public static readonly ConfigEntrySettings<int> ExtraItemSlotsAmount = new ConfigEntrySettings<int>("ExtraItemSlots", 2, 0);
 
             public static string TerminalItemWeightsSectionHeader => "TerminalItemWeights";
 
-            public static readonly Dictionary<string, ItemConfigEntry> TerminalItemWeights = new Dictionary<string, ItemConfigEntry>() {
-                {"WalkieTalkie", new ItemConfigEntry(0, 0)},
-                {"Flashlight", new ItemConfigEntry(0, 0)},
-                {"Shovel", new ItemConfigEntry(5, 18)},
-                {"LockPicker", new ItemConfigEntry(2, 15)},
-                {"ProFlashlight", new ItemConfigEntry(0, 5)},
-                {"StunGrenade", new ItemConfigEntry(2, 5)},
-                {"Boombox", new ItemConfigEntry(5, 15)},
-                {"TZPInhalant", new ItemConfigEntry(0, 0)},
-                {"ZapGun", new ItemConfigEntry(4, 10)},
-                {"Jetpack", new ItemConfigEntry(10, 50)},
-                {"ExtensionLadder", new ItemConfigEntry(0, 0)}
-            };
+            public static readonly Dictionary<string, ConfigEntrySettings<int>> TerminalItemWeights =
+                new Dictionary<string, ConfigEntrySettings<int>>()
+                {
+                    {"WalkieTalkie", new ConfigEntrySettings<int>("WalkieTalkie", 0, 0)},
+                    {"Flashlight", new ConfigEntrySettings<int>("Flashlight", 0, 0)},
+                    {"Shovel", new ConfigEntrySettings<int>("Shovel", 5, 18)},
+                    {"LockPicker", new ConfigEntrySettings<int>("LockPicker", 2, 15)},
+                    {"ProFlashlight", new ConfigEntrySettings<int>("ProFlashlight", 0, 5)},
+                    {"StunGrenade", new ConfigEntrySettings<int>("StunGrenade", 2, 5)},
+                    {"Boombox", new ConfigEntrySettings<int>("Boombox", 5, 15)},
+                    {"TZPInhalant", new ConfigEntrySettings<int>("TZPInhalant", 0, 0)},
+                    {"ZapGun", new ConfigEntrySettings<int>("ZapGun", 4, 10)},
+                    {"Jetpack", new ConfigEntrySettings<int>("Jetpack", 10, 50)},
+                    {"ExtensionLadder", new ConfigEntrySettings<int>("ExtensionLadder", 0, 0)}
+                };
 
-        }
-
-        public static void RegisterPatches(Harmony harmony) 
-        {
-            MethodInfo PlayerControllerB_Awake = AccessTools.Method(typeof(PlayerControllerB), "Awake");
-            MethodInfo PlayerControllerB_PostAwakeMethod = AccessTools.Method(typeof(InventoryTweaks), "ChangeItemSlotsAmount");            
-            
-            MethodInfo HUDManager_Awake = AccessTools.Method(typeof(HUDManager), "Awake");
-            MethodInfo HUDManager_PostAwakeMethod = AccessTools.Method(typeof(InventoryTweaks), "ChangeItemSlotsAmountUI");
-
-            MethodInfo GrabbableObject_Start = AccessTools.Method(typeof(GrabbableObject), "Start");
-            MethodInfo GrabbableObject_PostStartMethod = AccessTools.Method(typeof(InventoryTweaks), "ChangeTerminalItemWeights");
-
-            harmony.Patch(PlayerControllerB_Awake, null, new HarmonyMethod(PlayerControllerB_PostAwakeMethod));
-            harmony.Patch(HUDManager_Awake, null, new HarmonyMethod(HUDManager_PostAwakeMethod));
-            harmony.Patch(GrabbableObject_Start, null, new HarmonyMethod(GrabbableObject_PostStartMethod));
         }
 
         public static void RegisterConfigs(ConfigFile config)
         {
-            Configs.ExtraItemSlotsAmount = config.Bind(Configs.InventoryTweaksSectionHeader, Configs.ExtraItemSlotsAmountConfigName, 2, Configs.ExtraItemSlotsAmountConfigDesc);
+            Configs.ExtraItemSlotsAmount.Entry = config.Bind(Configs.InventoryTweaksSectionHeader, Configs.ExtraItemSlotsAmount.ConfigName, Configs.ExtraItemSlotsAmount.DefaultValue, Configs.ExtraItemSlotsAmount.ConfigDesc);
 
             foreach (string key in Configs.TerminalItemWeights.Keys)
             {
-                Configs.TerminalItemWeights[key].WeightCost = config.Bind(Configs.TerminalItemWeightsSectionHeader,
-                    key, Configs.TerminalItemWeights[key].DefaultWeightCost, Configs.TerminalItemWeights[key].ConfigDesc);
+                Configs.TerminalItemWeights[key].Entry = config.Bind(Configs.TerminalItemWeightsSectionHeader,
+                    key, Configs.TerminalItemWeights[key].DefaultValue, Configs.TerminalItemWeights[key].ConfigDesc);
             }
         }
 
+        [HarmonyPatch(typeof(PlayerControllerB), "Awake")]
+        [HarmonyPostfix]
         private static void ChangeItemSlotsAmount(PlayerControllerB __instance)
         {
             __instance.ItemSlots = new GrabbableObject[4 + Configs.ExtraItemSlotsAmount.Value];
         }
 
+        [HarmonyPatch(typeof(HUDManager), "Awake")]
+        [HarmonyPostfix]
         private static void ChangeItemSlotsAmountUI(HUDManager __instance)
         {
             // Prepare the arrays
@@ -130,6 +102,8 @@ namespace MikesTweaks.Scripts.Inventory
             HUDManager.Instance.itemSlotIcons = ItemSlotIcons;
         }
 
+        [HarmonyPatch(typeof(GrabbableObject), nameof(GrabbableObject.Start))]
+        [HarmonyPostfix]
         private static void ChangeTerminalItemWeights(GrabbableObject __instance)
         {
             if (__instance == null)
@@ -138,7 +112,7 @@ namespace MikesTweaks.Scripts.Inventory
             if (!Configs.TerminalItemWeights.TryGetValue(__instance.itemProperties.name, out var Entry))
                 return;
 
-            __instance.itemProperties.weight = (((float)Entry.WeightCost.Value) / 100f) + 1f;
+            __instance.itemProperties.weight = (((float)Entry.Value) / 100f) + 1f;
         }
     }
 }
