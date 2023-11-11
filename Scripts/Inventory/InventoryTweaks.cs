@@ -56,6 +56,9 @@ namespace MikesTweaks.Scripts.Inventory
         [HarmonyPostfix]
         private static void ChangeItemSlotsAmount(PlayerControllerB __instance)
         {
+            if (Configs.ExtraItemSlotsAmount.Value == 0)
+                return;
+
             __instance.ItemSlots = new GrabbableObject[4 + Configs.ExtraItemSlotsAmount.Value];
         }
 
@@ -63,6 +66,9 @@ namespace MikesTweaks.Scripts.Inventory
         [HarmonyPostfix]
         private static void ChangeItemSlotsAmountUI(HUDManager __instance)
         {
+            if (Configs.ExtraItemSlotsAmount.Value == 0)
+                return;
+
             // Prepare the arrays
             Image[] ItemSlotIconFrames = new Image[4 + Configs.ExtraItemSlotsAmount.Value];
             ItemSlotIconFrames[0] = HUDManager.Instance.itemSlotIconFrames[0];

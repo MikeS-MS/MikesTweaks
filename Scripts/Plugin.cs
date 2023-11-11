@@ -17,7 +17,7 @@ namespace MikesTweaks.Scripts
     {
         public const string PluginGUID = "mikes.lethalcompany.mikestweaks";
         public const string PluginName = "Mike's Tweaks";
-        public const string PluginVersion = "1.1";
+        public const string PluginVersion = "1.2";
         public static ManualLogSource Log = null;
 
         private void Awake()
@@ -30,8 +30,8 @@ namespace MikesTweaks.Scripts
             PlayerTweaks.RegisterConfigs(Config);
             WorldTweaks.RegisterConfigs(Config);
 
+            Harmony.CreateAndPatchAll(typeof(PlayerControllerB_Patches));
             Harmony.CreateAndPatchAll(typeof(InventoryTweaks));
-            Harmony.CreateAndPatchAll(typeof(PlayerTweaks));
             Harmony.CreateAndPatchAll(typeof(WorldTweaks));
         }
     }
