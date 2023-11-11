@@ -16,6 +16,7 @@ These are the default tweaks that are adjustable from the config file:
   - ZapGun: 4 lb (was 10 lb)
   - Jetpack: 10 lb (was 50 lb)
   - ExtensionLadder: 0 lb (was 0 lb)
+  - Radar Booster: 5 lb (was 18 lb)
 # 3. Player Sprint
 - Sprint Longevity: 12 (was 5)
 - Stamina Drain from jump: 0.04 (was 0.08)
