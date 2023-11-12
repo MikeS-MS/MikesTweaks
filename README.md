@@ -3,7 +3,7 @@ Mod for Lethal Company with multiple tweaks to make the game better
 
 These are the default tweaks that are adjustable from the config file:
 # 1. Inventory slots
-- Slots Amount: 6 (was 4)
+  - Slots Amount: 6 (was 4)
 # 2. Item weights changes
   - WalkieTalkie: 0 lb (was 0 lb)
   - Flashlight: 0 lb (was 0 lb)
@@ -17,10 +17,13 @@ These are the default tweaks that are adjustable from the config file:
   - Jetpack: 10 lb (was 50 lb)
   - ExtensionLadder: 0 lb (was 0 lb)
   - Radar Booster: 5 lb (was 18 lb)
-# 3. Player Sprint
-- Sprint Longevity: 12 (was 5)
-- Stamina Drain from jump: 0.04 (was 0.08)
-- Default Sprint Multiplier value: 1.5 (was 1)
-- Max Sprint Multiplier Value: 3 (was 2.25)
-# 4. World Time Speed
-- Speed: 0.5 (was 1)
+# 3. Player Keybinds
+  - Hotbar slots: 1-9 keyboard keys
+  - Emotes: Y and U keys
+# 4. Player Sprint
+  - Sprint Longevity: 12 (was 5)
+  - Stamina Drain from jump: 0.04 (was 0.08)
+  - Default Sprint Multiplier value: 1.5 (was 1)
+  - Max Sprint Multiplier Value: 3 (was 2.25)
+# 5. World Time Speed
+  - Speed: 0.5 (was 1)
