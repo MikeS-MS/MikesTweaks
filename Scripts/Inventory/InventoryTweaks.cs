@@ -14,8 +14,7 @@ namespace MikesTweaks.Scripts.Inventory
 {
     public class InventoryTweaks
     {
-
-        private static class Configs
+        public static class Configs
         {
             public static string InventoryTweaksSectionHeader => "InventoryTweaks";
 
@@ -53,9 +52,12 @@ namespace MikesTweaks.Scripts.Inventory
             }
         }
 
-        [HarmonyPatch(typeof(PlayerControllerB), "Awake")]
-        [HarmonyPostfix]
-        private static void ChangeItemSlotsAmount(PlayerControllerB __instance)
+        public static bool HasEnoughSlots(int slotID)
+        {
+            return ((Configs.ExtraItemSlotsAmount.Value + 4) - (slotID + 1)) > -1;
+        }
+
+        public static void ChangeItemSlotsAmount(PlayerControllerB __instance)
         {
             if (Configs.ExtraItemSlotsAmount.Value == 0)
                 return;
