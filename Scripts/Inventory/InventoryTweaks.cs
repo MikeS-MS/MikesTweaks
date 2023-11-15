@@ -24,33 +24,30 @@ namespace MikesTweaks.Scripts.Inventory
 
             public static string TerminalItemWeightsSectionHeader => "TerminalItemWeights";
 
-            public static Dictionary<string, ConfigEntrySettings<int>> TerminalItemWeights =
-                new Dictionary<string, ConfigEntrySettings<int>>()
+            public static ConfigEntrySettings<int>[] TerminalItemWeights =
+                new ConfigEntrySettings<int>[]
                 {
-                    {"WalkieTalkie", new ConfigEntrySettings<int>("WalkieTalkie", 0, 0)},
-                    {"Flashlight", new ConfigEntrySettings<int>("Flashlight", 0, 0)},
-                    {"Shovel", new ConfigEntrySettings<int>("Shovel", 5, 18)},
-                    {"LockPicker", new ConfigEntrySettings<int>("LockPicker", 2, 15)},
-                    {"ProFlashlight", new ConfigEntrySettings<int>("ProFlashlight", 0, 5)},
-                    {"StunGrenade", new ConfigEntrySettings<int>("StunGrenade", 2, 5)},
-                    {"Boombox", new ConfigEntrySettings<int>("Boombox", 5, 15)},
-                    {"TZPInhalant", new ConfigEntrySettings<int>("TZPInhalant", 0, 0)},
-                    {"ZapGun", new ConfigEntrySettings<int>("ZapGun", 4, 10)},
-                    {"Jetpack", new ConfigEntrySettings<int>("Jetpack", 10, 50)},
-                    {"ExtensionLadder", new ConfigEntrySettings<int>("ExtensionLadder", 0, 0)},
-                    {"RadarBooster", new ConfigEntrySettings<int>("RadarBooster", 5, 18)}
+                    new ConfigEntrySettings<int>("WalkieTalkie", 0, 0),
+                    new ConfigEntrySettings<int>("Flashlight", 0, 0),
+                    new ConfigEntrySettings<int>("Shovel", 5, 18),
+                    new ConfigEntrySettings<int>("LockPicker", 2, 15),
+                    new ConfigEntrySettings<int>("ProFlashlight", 0, 5),
+                    new ConfigEntrySettings<int>("StunGrenade", 2, 5),
+                    new ConfigEntrySettings<int>("Boombox", 5, 15),
+                    new ConfigEntrySettings<int>("TZPInhalant", 0, 0),
+                    new ConfigEntrySettings<int>("ZapGun", 4, 10),
+                    new ConfigEntrySettings<int>("Jetpack", 10, 50),
+                    new ConfigEntrySettings<int>("ExtensionLadder", 0, 0),
+                    new ConfigEntrySettings<int>("RadarBooster", 5, 18)
                 };
         }
 
         public static void RegisterConfigs(ConfigFile config)
         {
-            Configs.ExtraItemSlotsAmount.Entry = config.Bind(Configs.InventoryTweaksSectionHeader, Configs.ExtraItemSlotsAmount.ConfigName, Configs.ExtraItemSlotsAmount.DefaultValue, Configs.ExtraItemSlotsAmount.ConfigDesc);
+            MikesTweaks.Instance.BindConfig(ref Configs.ExtraItemSlotsAmount, Configs.InventoryTweaksSectionHeader);
 
-            foreach (string key in Configs.TerminalItemWeights.Keys)
-            {
-                Configs.TerminalItemWeights[key].Entry = config.Bind(Configs.TerminalItemWeightsSectionHeader,
-                    key, Configs.TerminalItemWeights[key].DefaultValue, Configs.TerminalItemWeights[key].ConfigDesc);
-            }
+            for (int i = 0; i < Configs.TerminalItemWeights.Length; i++)
+                MikesTweaks.Instance.BindConfig(ref Configs.TerminalItemWeights[i], Configs.TerminalItemWeightsSectionHeader);
 
             ConfigsSynchronizer.OnConfigsChangedDelegate += ReapplyConfigs;
             ConfigsSynchronizer.Instance.AddConfigGetter(WriteConfigsToWriter);
@@ -159,10 +156,12 @@ namespace MikesTweaks.Scripts.Inventory
             if (__instance == null)
                 return;
 
-            if (!Configs.TerminalItemWeights.TryGetValue(__instance.itemProperties.name, out var Entry))
-                return;
+            int index = Array.FindIndex(Configs.TerminalItemWeights,
+                (ConfigEntrySettings<int> config) => config.ConfigName == __instance.itemProperties.name);
 
-            __instance.itemProperties.weight = (((float)Entry.Value) / 100f) + 1f;
+            if (index == -1) return;
+
+            __instance.itemProperties.weight = (((float)Configs.TerminalItemWeights[index].Value) / 100f) + 1f;
 
         }
     }

@@ -1,3 +1,7 @@
+# Version 1.4.1
+**Added**
+ - Switching between item slots will now properly sync to other players with the mod. This cannot work for people without the mod due to the original game's code.
+ 
 # Version 1.4
 **Added**
  - Configs are now synced from Host to Client when someone joins your lobby.

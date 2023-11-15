@@ -22,9 +22,14 @@ namespace MikesTweaks.Scripts
     {
         public const string GUID = "mikes.lethalcompany.mikestweaks";
         public const string Name = "Mike's Tweaks";
-        public const string Version = "1.4";
+        public const string Version = "1.4.2";
         public static ManualLogSource Log = null;
         public static MikesTweaks Instance { get; private set; } = null;
+
+        public void BindConfig<T>(ref ConfigEntrySettings<T> config, string SectionName)
+        {
+            config.Entry = Config.Bind(SectionName, config.ConfigName, config.DefaultValue, config.ConfigDesc);
+        }
 
         public void LoadConfigs()
         {
@@ -42,6 +47,7 @@ namespace MikesTweaks.Scripts
 
             Harmony.CreateAndPatchAll(typeof(NetworkManager_Patches));
             Harmony.CreateAndPatchAll(typeof(ConfigsRelated_Patches));
+            Harmony.CreateAndPatchAll(typeof(PlayerTweaks));
             Harmony.CreateAndPatchAll(typeof(PlayerControllerB_Patches));
             Harmony.CreateAndPatchAll(typeof(InventoryTweaks));
             Harmony.CreateAndPatchAll(typeof(WorldTweaks));

@@ -23,9 +23,7 @@ namespace MikesTweaks.Scripts.World
 
         public static void RegisterConfigs(ConfigFile config)
         {
-            Configs.GlobalTimeSpeedMulti.Entry = config.Bind(Configs.WorldTweaksSectionHeader,
-                Configs.GlobalTimeSpeedMulti.ConfigName, Configs.GlobalTimeSpeedMulti.DefaultValue,
-                Configs.GlobalTimeSpeedMulti.ConfigDesc);
+            MikesTweaks.Instance.BindConfig(ref Configs.GlobalTimeSpeedMulti, Configs.WorldTweaksSectionHeader);
 
             ConfigsSynchronizer.OnConfigsChangedDelegate += () => ReapplyConfigs(TimeOfDay.Instance);
             ConfigsSynchronizer.Instance.AddConfigGetter(WriteConfigsToWriter);

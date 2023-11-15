@@ -18,7 +18,9 @@ using OpCodes = System.Reflection.Emit.OpCodes;
 using System.Reflection.Emit;
 using Dissonance.Integrations.Unity_NFGO;
 using MikesTweaks.Scripts.Networking;
+using Unity.Collections;
 using Unity.Netcode;
+using static UnityEngine.UI.GridLayoutGroup;
 
 namespace MikesTweaks.Scripts.Player
 {
@@ -50,7 +52,7 @@ namespace MikesTweaks.Scripts.Player
 
             public static string KeybindsSectionHeader => "Keybinds";
 
-            public static List<ConfigEntrySettings<string>> SlotKeybinds = new List<ConfigEntrySettings<string>>()
+            public static ConfigEntrySettings<string>[] SlotKeybinds = new ConfigEntrySettings<string>[]
             {
                 new ConfigEntrySettings<string>("Slot1", "<Keyboard>/1", ""),
                 new ConfigEntrySettings<string>("Slot2", "<Keyboard>/2", ""),
@@ -63,7 +65,7 @@ namespace MikesTweaks.Scripts.Player
                 new ConfigEntrySettings<string>("Slot9", "<Keyboard>/9", "")
             };
 
-            public static List<ConfigEntrySettings<string>> EmoteKeybinds = new List<ConfigEntrySettings<string>>()
+            public static ConfigEntrySettings<string>[] EmoteKeybinds = new ConfigEntrySettings<string>[]
             {
                 new ConfigEntrySettings<string>("Emote1", "<Keyboard>/y", "<Keyboard>/1"),
                 new ConfigEntrySettings<string>("Emote2", "<Keyboard>/u", "<Keyboard>/2")
@@ -71,38 +73,23 @@ namespace MikesTweaks.Scripts.Player
         }
 
         public static PlayerControllerB LocalPlayerController = null;
+        public static string PlayerSwitchSlotChannel => "PlayerChangeSlot";
+        public static string PlayerSwitchSlotRequestChannel => "PlayerChangeSlotRequest";
 
         public static void RegisterConfigs(ConfigFile config)
         {
-            Configs.SprintLongevity.Entry = config.Bind(Configs.PlayerTweaksSectionHeader,
-                Configs.SprintLongevity.ConfigName, Configs.SprintLongevity.DefaultValue,
-                Configs.SprintLongevity.ConfigDesc);
+            MikesTweaks.Instance.BindConfig(ref Configs.SprintLongevity, Configs.PlayerTweaksSectionHeader);
+            MikesTweaks.Instance.BindConfig(ref Configs.DefaultSprintMultiplier, Configs.PlayerTweaksSectionHeader);
+            MikesTweaks.Instance.BindConfig(ref Configs.SprintMultiplierIncrease, Configs.PlayerTweaksSectionHeader);
+            MikesTweaks.Instance.BindConfig(ref Configs.SprintMultiplierDecrease, Configs.PlayerTweaksSectionHeader);
+            MikesTweaks.Instance.BindConfig(ref Configs.MaxSprintMultiplier, Configs.PlayerTweaksSectionHeader);
+            MikesTweaks.Instance.BindConfig(ref Configs.JumpStaminaDrain, Configs.PlayerTweaksSectionHeader);
 
-            Configs.DefaultSprintMultiplier.Entry = config.Bind(Configs.PlayerTweaksSectionHeader,
-                Configs.DefaultSprintMultiplier.ConfigName, Configs.DefaultSprintMultiplier.DefaultValue,
-                Configs.DefaultSprintMultiplier.ConfigDesc);
+            for (int i = 0; i < Configs.SlotKeybinds.Length; i++)
+                MikesTweaks.Instance.BindConfig(ref Configs.SlotKeybinds[i], Configs.KeybindsSectionHeader);
 
-            Configs.SprintMultiplierIncrease.Entry = config.Bind(Configs.PlayerTweaksSectionHeader,
-                Configs.SprintMultiplierIncrease.ConfigName, Configs.SprintMultiplierIncrease.DefaultValue,
-                Configs.SprintMultiplierIncrease.ConfigDesc);
-
-            Configs.SprintMultiplierDecrease.Entry = config.Bind(Configs.PlayerTweaksSectionHeader,
-                Configs.SprintMultiplierDecrease.ConfigName, Configs.SprintMultiplierDecrease.DefaultValue,
-                Configs.SprintMultiplierDecrease.ConfigDesc);
-
-            Configs.MaxSprintMultiplier.Entry = config.Bind(Configs.PlayerTweaksSectionHeader,
-                Configs.MaxSprintMultiplier.ConfigName, Configs.MaxSprintMultiplier.DefaultValue,
-                Configs.MaxSprintMultiplier.ConfigDesc);
-
-            Configs.JumpStaminaDrain.Entry = config.Bind(Configs.PlayerTweaksSectionHeader,
-                Configs.JumpStaminaDrain.ConfigName, Configs.JumpStaminaDrain.DefaultValue,
-                Configs.JumpStaminaDrain.ConfigDesc);
-
-            foreach (ConfigEntrySettings<string> slot in Configs.SlotKeybinds)
-                slot.Entry = config.Bind(Configs.KeybindsSectionHeader, slot.ConfigName, slot.DefaultValue, slot.ConfigDesc);
-
-            foreach (ConfigEntrySettings<string> emote in Configs.EmoteKeybinds)
-                emote.Entry = config.Bind(Configs.KeybindsSectionHeader, emote.ConfigName, emote.DefaultValue, emote.ConfigDesc);
+            for (int i = 0; i < Configs.EmoteKeybinds.Length; i++)
+                MikesTweaks.Instance.BindConfig(ref Configs.EmoteKeybinds[i], Configs.KeybindsSectionHeader);
 
             ConfigsSynchronizer.OnConfigsChangedDelegate += () => ReapplyConfigs(LocalPlayerController, true, true);
             ConfigsSynchronizer.Instance.AddConfigGetter(WriteConfigsToWriter);
@@ -123,7 +110,7 @@ namespace MikesTweaks.Scripts.Player
 
             // The dev's mess
             if ((!player.IsOwner || !player.isPlayerControlled || player.IsServer && !player.isHostPlayerObject) &&
-                !player.isTestingPlayer || timeSinceSwitchingSlots < 0.30000001192092896 ||
+                !player.isTestingPlayer || timeSinceSwitchingSlots < 0.3f ||
                 player.isGrabbingObjectAnimation || player.inSpecialInteractAnimation || throwingObject ||
                 player.isTypingChat || player.twoHanded || player.activatingItem || player.jetpackControls ||
                 player.disablingJetpackControls)
@@ -175,6 +162,69 @@ namespace MikesTweaks.Scripts.Player
             if (updateHud)
                 InventoryTweaks.ChangeItemSlotsAmountUI(HUDManager.Instance);
         }
+        public static void RegisterSwitchSlotMessage()
+        {
+            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(PlayerSwitchSlotChannel, ReceiveSwitchSlot);
+            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(PlayerSwitchSlotRequestChannel, ReceiveSwitchSlotRequest);
+        }
+
+        public static void SwitchSlot_Server(int slot, ulong clientIDOfChagedSlot)
+        {
+            if (!NetworkManager.Singleton.IsServer)
+                return;
+
+            // Send the message
+            CustomMessagingManager manager = NetworkManager.Singleton.CustomMessagingManager;
+            FastBufferWriter writer = new FastBufferWriter(sizeof(int) + sizeof(ulong), Allocator.Temp);
+            writer.WriteValueSafe(slot);
+            writer.WriteValueSafe(clientIDOfChagedSlot);
+            manager.SendNamedMessageToAll(PlayerSwitchSlotChannel, writer, NetworkDelivery.Reliable);
+        }
+
+        public static void ReceiveSwitchSlotRequest(ulong senderID, FastBufferReader payload)
+        {
+            if (!NetworkManager.Singleton.IsServer) return;
+
+            payload.ReadValueSafe(out int slot);
+            SwitchSlot_Server(slot, senderID);
+        }
+
+        public static void ReceiveSwitchSlot(ulong senderID, FastBufferReader payload)
+        {
+            payload.ReadValueSafe(out int slot);
+            payload.ReadValueSafe(out ulong clientID);
+
+            foreach (PlayerControllerB playerController in StartOfRound.Instance.allPlayerScripts)
+            {
+                if (playerController.playerClientId != clientID)
+                    continue;
+
+                playerController.gameObject.GetComponent<PlayerInputRedirection>().SwitchToSlot(slot);
+                break;
+            }
+        }
+
+        [HarmonyPatch(typeof(IngamePlayerSettings))]
+        [HarmonyPatch(nameof(IngamePlayerSettings.RebindKey))]
+        [HarmonyTranspiler]
+        private static IEnumerable<CodeInstruction> AllowMouseBinding(IEnumerable<CodeInstruction> instructions)
+        {
+            List<CodeInstruction> instructionsToList = new List<CodeInstruction>(instructions);
+
+            for (int i = 0; i < instructionsToList.Count; i++)
+            {
+                var instruction = instructionsToList[i];
+                if (instruction.opcode != OpCodes.Ldstr)
+                    continue;
+                if ((string)instruction.operand != "Mouse")
+                    continue;
+
+                instructionsToList.RemoveAt(i + 1);
+                instructionsToList.RemoveAt(i);
+            }
+
+            return instructionsToList.AsEnumerable();
+        }
     }
 
     public class PlayerInputRedirection : MonoBehaviour, PlayerHotbarInput.IHotbarActions
@@ -182,43 +232,13 @@ namespace MikesTweaks.Scripts.Player
         private PlayerControllerB owner = null;
         private PlayerHotbarInput input = null;
         private MethodInfo SwitchToSlotMethod = null;
-        
-        public void Awake()
-        {
-            owner = gameObject.GetComponent<PlayerControllerB>();
-            SwitchToSlotMethod = typeof(PlayerControllerB).GetMethod("SwitchToItemSlot", BindingFlags.NonPublic | BindingFlags.Instance);
-        }
-
-        //public void Start()
-        //{
-        //    if (PlayerTweaks.ConfigsChanged)
-        //    {
-        //        PlayerTweaks.ReapplyConfigs(owner, true, true);
-        //    }
-        //}
-        
-        public void SwitchSlot_Server(int slot)
-        {
-            if (!PlayerTweaks.CanSwitchSlot(owner))
-                return;
-
-            ShipBuildModeManager.Instance.CancelBuildMode();
-            owner.playerBodyAnimator.SetBool("GrabValidated", false);
-            SwitchToSlot(slot);
-            SwitchSlot_Client(slot);
-        }
-
-        public void SwitchSlot_Client(int slot)
-        {
-            SwitchToSlot(slot);
-        }
 
         public void OnHotbar1(InputAction.CallbackContext context)
         {
             if (context.phase != InputActionPhase.Performed)
                 return;
 
-            SwitchSlot_Server(0);
+            RequestSlotChange(0);
         }
 
         public void OnHotbar2(InputAction.CallbackContext context)
@@ -226,7 +246,7 @@ namespace MikesTweaks.Scripts.Player
             if (context.phase != InputActionPhase.Performed)
                 return;
 
-            SwitchSlot_Server(1);
+            RequestSlotChange(1);
         }
 
         public void OnHotbar3(InputAction.CallbackContext context)
@@ -234,7 +254,7 @@ namespace MikesTweaks.Scripts.Player
             if (context.phase != InputActionPhase.Performed)
                 return;
 
-            SwitchSlot_Server(2);
+            RequestSlotChange(2);
         }
 
         public void OnHotbar4(InputAction.CallbackContext context)
@@ -242,7 +262,7 @@ namespace MikesTweaks.Scripts.Player
             if (context.phase != InputActionPhase.Performed)
                 return;
 
-            SwitchSlot_Server(3);
+            RequestSlotChange(3);
         }
 
         public void OnHotbar5(InputAction.CallbackContext context)
@@ -253,7 +273,7 @@ namespace MikesTweaks.Scripts.Player
             if (!InventoryTweaks.HasEnoughSlots(4))
                 return;
 
-            SwitchSlot_Server(4);
+            RequestSlotChange(4);
         }
 
         public void OnHotbar6(InputAction.CallbackContext context)
@@ -264,7 +284,7 @@ namespace MikesTweaks.Scripts.Player
             if (!InventoryTweaks.HasEnoughSlots(5))
                 return;
 
-            SwitchSlot_Server(5);
+            RequestSlotChange(5);
         }
 
         public void OnHotbar7(InputAction.CallbackContext context)
@@ -275,7 +295,7 @@ namespace MikesTweaks.Scripts.Player
             if (!InventoryTweaks.HasEnoughSlots(6))
                 return;
 
-            SwitchSlot_Server(6);
+            RequestSlotChange(6);
         }
 
         public void OnHotbar8(InputAction.CallbackContext context)
@@ -286,7 +306,7 @@ namespace MikesTweaks.Scripts.Player
             if (!InventoryTweaks.HasEnoughSlots(7))
                 return;
 
-            SwitchSlot_Server(7);
+            RequestSlotChange(7);
         }
 
         public void OnHotbar9(InputAction.CallbackContext context)
@@ -297,7 +317,7 @@ namespace MikesTweaks.Scripts.Player
             if (!InventoryTweaks.HasEnoughSlots(8))
                 return;
 
-            SwitchSlot_Server(8);
+            RequestSlotChange(8);
         }
 
         public void OnEnable()
@@ -350,10 +370,33 @@ namespace MikesTweaks.Scripts.Player
             input.Hotbar.Hotbar9.AddBinding(PlayerTweaks.Configs.SlotKeybinds[8].Value);
         }
 
-        private void SwitchToSlot(int slot)
+        private void Awake()
         {
+            owner = gameObject.GetComponent<PlayerControllerB>();
+            SwitchToSlotMethod = typeof(PlayerControllerB).GetMethod("SwitchToItemSlot", BindingFlags.NonPublic | BindingFlags.Instance);
+        }
+
+        private void RequestSlotChange(int slot)
+        {
+            if (!PlayerTweaks.CanSwitchSlot(owner))
+                return;
+
+            SwitchToSlot(slot);
+            CustomMessagingManager manager = NetworkManager.Singleton.CustomMessagingManager;
+            FastBufferWriter writer = new FastBufferWriter(sizeof(int), Allocator.Temp);
+            writer.WriteValueSafe(slot);
+            manager.SendNamedMessage(PlayerTweaks.PlayerSwitchSlotRequestChannel, 0, writer, NetworkDelivery.Reliable);
+            typeof(PlayerControllerB).GetField("timeSinceSwitchingSlots", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(owner, 0f);
+        }
+
+        public void SwitchToSlot(int slot)
+        {
+            // because the dev sets them here
+            ShipBuildModeManager.Instance.CancelBuildMode();
+            int backup = owner.currentItemSlot;
+            owner.playerBodyAnimator.SetBool("GrabValidated", false);
             object[] args = { slot, null };
-            SwitchToSlotMethod?.Invoke(owner, args);
+            SwitchToSlotMethod.Invoke(owner, args);
         }
     }
 
@@ -379,7 +422,7 @@ namespace MikesTweaks.Scripts.Player
         // Change the arbitrary values inside the Update() method to use the values of modifiable variables.
         [HarmonyPatch("Update")]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Update_Transpiler(IEnumerable<CodeInstruction> instructions)
+        private static IEnumerable<CodeInstruction> Update_Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             List<CodeInstruction> instructionsAsList = new List<CodeInstruction>(instructions);
             ModifySprintMultiplierValues(ref instructionsAsList);
@@ -404,7 +447,7 @@ namespace MikesTweaks.Scripts.Player
 
         [HarmonyPatch("Jump_performed")]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> ModifyJumpDrain(IEnumerable<CodeInstruction> instructions)
+        private static IEnumerable<CodeInstruction> ModifyJumpDrain(IEnumerable<CodeInstruction> instructions)
         {
             float JumpDrainValue = 0.08f;
 
@@ -424,6 +467,13 @@ namespace MikesTweaks.Scripts.Player
             }
 
             return toListInstructions.AsEnumerable();
+        }
+
+        [HarmonyPatch("Start")]
+        [HarmonyPostfix]
+        private static void Start(PlayerControllerB __instance)
+        {
+            PlayerTweaks.RegisterSwitchSlotMessage();
         }
 
         [HarmonyPatch("Awake")]

@@ -143,7 +143,6 @@ namespace MikesTweaks.Scripts.Networking
 
             if (NetworkManager.Singleton.IsServer)
                 return;
-
             ConfigsSynchronizer.Instance.RequestConfigs();
         }
 
