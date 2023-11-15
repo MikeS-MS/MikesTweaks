@@ -1,3 +1,7 @@
+# Version 1.4.3
+**Added**
+ - Fixed link in README.md to link to the correct place
+
 # Version 1.4.2
 **Added**
  - Switching between item slots will now properly sync to other players with the mod. This cannot work for people without the mod due to the original game's code.

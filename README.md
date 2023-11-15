@@ -1,6 +1,9 @@
 # MikesTweaks
 Mod for Lethal Company with multiple tweaks to make the game better
 
+# NOTE:
+- You don't need to download 1.4.3 if you have 1.4.2, because the actual version of the mod is still 1.4.2 in both.
+
 # Requirements
 - It's a good idea for everyone that will join your lobby to have this mod installed as well and have the same version. Not having the mod and joining someone who does might result in unexpected behaviour and bugs.
 - You will need BepinEx to use this mod, which you can check how to get and install from [here](https://github.com/LethalCompany/LethalCompanyModdingWiki/wiki/Installing-mods) (this message will stay here until BepinEx for Lethal Company has been released on the Thunderstore so I can add it as a dependency and it automatically downloads)
