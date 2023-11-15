@@ -17,17 +17,18 @@ namespace MikesTweaks.Scripts
             ExtraDescription = extraDescription;
         }
 
+        public Type type => typeof(T);
         public T Value => Entry.Value;
 
         public T DefaultValue { get; private set;}
         public string ConfigName { get; private set; }
         
-        public string ConfigDesc => $"Vanilla Default: {VanillaValue}\n{ExtraDescription}";
-        public ConfigEntry<T> Entry { private get; set; }
+        public string ConfigDesc => $"{ExtraDescription}\nVanilla Default: {VanillaValue}";
+        public ConfigEntry<T> Entry { get; set; }
     
         private readonly T VanillaValue;
-
         private readonly string ExtraDescription;
+
 
     }
 }

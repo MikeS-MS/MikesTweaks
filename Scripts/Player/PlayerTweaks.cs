@@ -16,8 +16,9 @@ using UnityEngine.InputSystem;
 using Object = System.Object;
 using OpCodes = System.Reflection.Emit.OpCodes;
 using System.Reflection.Emit;
+using Dissonance.Integrations.Unity_NFGO;
+using MikesTweaks.Scripts.Networking;
 using Unity.Netcode;
-using UnityEngine.InputSystem.LowLevel;
 
 namespace MikesTweaks.Scripts.Player
 {
@@ -28,22 +29,22 @@ namespace MikesTweaks.Scripts.Player
         {
             public static string PlayerTweaksSectionHeader => "PlayerTweaks";
 
-            public static readonly ConfigEntrySettings<float> SprintLongevity =
+            public static ConfigEntrySettings<float> SprintLongevity =
                 new ConfigEntrySettings<float>("SprintLongevity", 12, 5);
 
-            public static readonly ConfigEntrySettings<float> DefaultSprintMultiplier =
+            public static ConfigEntrySettings<float> DefaultSprintMultiplier =
                 new ConfigEntrySettings<float>("DefaultSprintMultiplier", 1.5f, 1f);
 
-            public static readonly ConfigEntrySettings<float> SprintMultiplierIncrease =
+            public static ConfigEntrySettings<float> SprintMultiplierIncrease =
                 new ConfigEntrySettings<float>("SprintMultiplierIncrease", 1f, 1f);
 
-            public static readonly ConfigEntrySettings<float> SprintMultiplierDecrease =
+            public static ConfigEntrySettings<float> SprintMultiplierDecrease =
                 new ConfigEntrySettings<float>("SprintMultiplierDecrease", 10f, 10f);
 
-            public static readonly ConfigEntrySettings<float> MaxSprintMultiplier =
+            public static ConfigEntrySettings<float> MaxSprintMultiplier =
                 new ConfigEntrySettings<float>("MaxSprintMultiplier", 3f, 2.25f);
 
-            public static readonly ConfigEntrySettings<float> JumpStaminaDrain =
+            public static ConfigEntrySettings<float> JumpStaminaDrain =
                 new ConfigEntrySettings<float>("JumpStaminaDrain", 0.04f, 0.08f);
 
 
@@ -69,15 +70,13 @@ namespace MikesTweaks.Scripts.Player
             };
         }
 
+        public static PlayerControllerB LocalPlayerController = null;
+
         public static void RegisterConfigs(ConfigFile config)
         {
             Configs.SprintLongevity.Entry = config.Bind(Configs.PlayerTweaksSectionHeader,
                 Configs.SprintLongevity.ConfigName, Configs.SprintLongevity.DefaultValue,
                 Configs.SprintLongevity.ConfigDesc);
-
-            Configs.JumpStaminaDrain.Entry = config.Bind(Configs.PlayerTweaksSectionHeader,
-                Configs.JumpStaminaDrain.ConfigName, Configs.JumpStaminaDrain.DefaultValue,
-                Configs.JumpStaminaDrain.ConfigDesc);
 
             Configs.DefaultSprintMultiplier.Entry = config.Bind(Configs.PlayerTweaksSectionHeader,
                 Configs.DefaultSprintMultiplier.ConfigName, Configs.DefaultSprintMultiplier.DefaultValue,
@@ -95,20 +94,90 @@ namespace MikesTweaks.Scripts.Player
                 Configs.MaxSprintMultiplier.ConfigName, Configs.MaxSprintMultiplier.DefaultValue,
                 Configs.MaxSprintMultiplier.ConfigDesc);
 
+            Configs.JumpStaminaDrain.Entry = config.Bind(Configs.PlayerTweaksSectionHeader,
+                Configs.JumpStaminaDrain.ConfigName, Configs.JumpStaminaDrain.DefaultValue,
+                Configs.JumpStaminaDrain.ConfigDesc);
+
             foreach (ConfigEntrySettings<string> slot in Configs.SlotKeybinds)
                 slot.Entry = config.Bind(Configs.KeybindsSectionHeader, slot.ConfigName, slot.DefaultValue, slot.ConfigDesc);
 
             foreach (ConfigEntrySettings<string> emote in Configs.EmoteKeybinds)
                 emote.Entry = config.Bind(Configs.KeybindsSectionHeader, emote.ConfigName, emote.DefaultValue, emote.ConfigDesc);
+
+            ConfigsSynchronizer.OnConfigsChangedDelegate += () => ReapplyConfigs(LocalPlayerController, true, true);
+            ConfigsSynchronizer.Instance.AddConfigGetter(WriteConfigsToWriter);
+            ConfigsSynchronizer.Instance.AddConfigSetter(ReadConfigChanges);
+            ConfigsSynchronizer.Instance.AddConfigSizeGetter(() => sizeof(float) * 6);
         }
 
         public static bool IsLocallyControlled(PlayerControllerB player)
         {
             return player.playerUsername == GameNetworkManager.Instance.username;
         }
+
+        public static bool CanSwitchSlot(PlayerControllerB player)
+        {
+            Type playerType = typeof(PlayerControllerB);
+            bool throwingObject = (bool)playerType.GetField("throwingObject", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(player);
+            float timeSinceSwitchingSlots = (float)playerType.GetField("timeSinceSwitchingSlots", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(player);
+
+            // The dev's mess
+            if ((!player.IsOwner || !player.isPlayerControlled || player.IsServer && !player.isHostPlayerObject) &&
+                !player.isTestingPlayer || timeSinceSwitchingSlots < 0.30000001192092896 ||
+                player.isGrabbingObjectAnimation || player.inSpecialInteractAnimation || throwingObject ||
+                player.isTypingChat || player.twoHanded || player.activatingItem || player.jetpackControls ||
+                player.disablingJetpackControls)
+                return false;
+
+            return true;
+        }
+
+        public static FastBufferWriter WriteConfigsToWriter(FastBufferWriter writer)
+        {
+            writer.WriteValueSafe(Configs.SprintLongevity.Value);
+            writer.WriteValueSafe(Configs.DefaultSprintMultiplier.Value);
+            writer.WriteValueSafe(Configs.SprintMultiplierIncrease.Value);
+            writer.WriteValueSafe(Configs.SprintMultiplierDecrease.Value);
+            writer.WriteValueSafe(Configs.MaxSprintMultiplier.Value);
+            writer.WriteValueSafe(Configs.JumpStaminaDrain.Value);
+
+            return writer;
+        }
+
+        public static FastBufferReader ReadConfigChanges(FastBufferReader payload)
+        {
+            payload.ReadValue(out float Value);
+            Configs.SprintLongevity.Entry.Value = Value;
+
+            payload.ReadValue(out Value);
+            Configs.DefaultSprintMultiplier.Entry.Value = Value;
+
+            payload.ReadValue(out Value);
+            Configs.SprintMultiplierIncrease.Entry.Value = Value;
+
+            payload.ReadValue(out Value);
+            Configs.SprintMultiplierDecrease.Entry.Value = Value;
+
+            payload.ReadValue(out Value);
+            Configs.MaxSprintMultiplier.Entry.Value = Value;
+
+            payload.ReadValue(out Value);
+            Configs.JumpStaminaDrain.Entry.Value = Value;
+
+            return payload;
+        }
+
+        public static void ReapplyConfigs(PlayerControllerB player, bool force = false, bool updateHud = false)
+        {
+            player.sprintTime = Configs.SprintLongevity.Value;
+            InventoryTweaks.ChangeItemSlotsAmount(player, force);
+
+            if (updateHud)
+                InventoryTweaks.ChangeItemSlotsAmountUI(HUDManager.Instance);
+        }
     }
 
-    public class PlayerInputRedirection : NetworkBehaviour, PlayerHotbarInput.IHotbarActions
+    public class PlayerInputRedirection : MonoBehaviour, PlayerHotbarInput.IHotbarActions
     {
         private PlayerControllerB owner = null;
         private PlayerHotbarInput input = null;
@@ -117,21 +186,28 @@ namespace MikesTweaks.Scripts.Player
         public void Awake()
         {
             owner = gameObject.GetComponent<PlayerControllerB>();
-            input = new PlayerHotbarInput();
-            input.Hotbar.SetCallbacks(this);
-            input.Enable();
-            BindHotbarSlots();
             SwitchToSlotMethod = typeof(PlayerControllerB).GetMethod("SwitchToItemSlot", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
-        [ServerRpc]
+        //public void Start()
+        //{
+        //    if (PlayerTweaks.ConfigsChanged)
+        //    {
+        //        PlayerTweaks.ReapplyConfigs(owner, true, true);
+        //    }
+        //}
+        
         public void SwitchSlot_Server(int slot)
         {
+            if (!PlayerTweaks.CanSwitchSlot(owner))
+                return;
+
+            ShipBuildModeManager.Instance.CancelBuildMode();
+            owner.playerBodyAnimator.SetBool("GrabValidated", false);
             SwitchToSlot(slot);
             SwitchSlot_Client(slot);
         }
 
-        [ClientRpc]
         public void SwitchSlot_Client(int slot)
         {
             SwitchToSlot(slot);
@@ -226,21 +302,26 @@ namespace MikesTweaks.Scripts.Player
 
         public void OnEnable()
         {
-            input.Enable();
+            input?.Enable();
         }
 
         public void OnDisable()
         {
-            input.Disable();
+            input?.Disable();
         }
 
         public void Destroy()
         {
-            input.Dispose();
+            input?.Dispose();
         }
 
-        private void BindHotbarSlots()
+        public void BindHotbarSlots()
         {
+            owner = gameObject.GetComponent<PlayerControllerB>();
+            input = new PlayerHotbarInput();
+            input.Hotbar.SetCallbacks(this);
+            input.Enable();
+
             input.Hotbar.Hotbar1.ChangeBinding(0).Erase();
             input.Hotbar.Hotbar1.AddBinding(PlayerTweaks.Configs.SlotKeybinds[0].Value);
 
@@ -287,6 +368,8 @@ namespace MikesTweaks.Scripts.Player
             if (!PlayerTweaks.IsLocallyControlled(__instance))
                 return;
 
+            inputRedirection = __instance.gameObject.GetComponent<PlayerInputRedirection>();
+            inputRedirection.BindHotbarSlots();
             __instance.playerActions.Movement.Emote1.ChangeBinding(0).Erase();
             __instance.playerActions.Movement.Emote1.AddBinding(PlayerTweaks.Configs.EmoteKeybinds[0].Value);
             __instance.playerActions.Movement.Emote2.ChangeBinding(0).Erase();
@@ -335,7 +418,8 @@ namespace MikesTweaks.Scripts.Player
                 if (Math.Abs((float)instruction.operand - JumpDrainValue) > 0.01f)
                     continue;
 
-                toListInstructions[i].operand = PlayerTweaks.Configs.JumpStaminaDrain.Value;
+                toListInstructions[i] = CodeInstruction.Call(typeof(ConfigEntrySettings<float>), "get_Value");
+                toListInstructions.Insert(i, CodeInstruction.LoadField(typeof(PlayerTweaks.Configs), nameof(PlayerTweaks.Configs.JumpStaminaDrain)));
                 break;
             }
 
@@ -346,9 +430,9 @@ namespace MikesTweaks.Scripts.Player
         [HarmonyPostfix]
         private static void Awake(PlayerControllerB __instance)
         {
-            __instance.sprintTime = PlayerTweaks.Configs.SprintLongevity.Value;
-            __instance.gameObject.AddComponent<PlayerInputRedirection>();
-            InventoryTweaks.ChangeItemSlotsAmount(__instance);
+            GameObject playerGameObject = __instance.gameObject;
+            playerGameObject.AddComponent<PlayerInputRedirection>();
+            PlayerTweaks.ReapplyConfigs(__instance);
         }
 
         private static void ModifySprintMultiplierValues(ref List<CodeInstruction> instructions)
@@ -373,7 +457,8 @@ namespace MikesTweaks.Scripts.Player
                     continue;
 
                 indexOfMaxSprintMultiplier = i;
-                instructions[i].operand = PlayerTweaks.Configs.MaxSprintMultiplier.Value;
+                instructions[i] = CodeInstruction.Call(typeof(ConfigEntrySettings<float>), "get_Value");
+                instructions.Insert(i, CodeInstruction.LoadField(typeof(PlayerTweaks.Configs), nameof(PlayerTweaks.Configs.MaxSprintMultiplier)));
                 break;
             }
 
@@ -390,19 +475,22 @@ namespace MikesTweaks.Scripts.Player
 
                     if (!patchedSprintMultiIncrease && Math.Abs((float)instruction.operand - SprintMultiIncreaseValue) < 0.1)
                     {
-                        instructions[i].operand = PlayerTweaks.Configs.SprintMultiplierIncrease.Value;
+                        instructions[i] = CodeInstruction.Call(typeof(ConfigEntrySettings<float>), "get_Value");
+                        instructions.Insert(i, CodeInstruction.LoadField(typeof(PlayerTweaks.Configs), nameof(PlayerTweaks.Configs.SprintMultiplierIncrease)));
                         patchedSprintMultiIncrease = true;
                         continue;
                     }
                     if (!patchedDefaultSprintMultiplier && Math.Abs((float)instruction.operand - DefaultSprintValue) < 0.1)
                     {
-                        instructions[i].operand = PlayerTweaks.Configs.DefaultSprintMultiplier.Value;
+                        instructions[i] = CodeInstruction.Call(typeof(ConfigEntrySettings<float>), "get_Value");
+                        instructions.Insert(i, CodeInstruction.LoadField(typeof(PlayerTweaks.Configs), nameof(PlayerTweaks.Configs.DefaultSprintMultiplier)));
                         patchedDefaultSprintMultiplier = true;
                         continue;
                     }
                     if (!patchedSprintMultiDecrease && Math.Abs((float)instruction.operand - SprintMultiDecreaseValue) < 0.1)
                     {
-                        instructions[i].operand = PlayerTweaks.Configs.SprintMultiplierDecrease.Value;
+                        instructions[i] = CodeInstruction.Call(typeof(ConfigEntrySettings<float>), "get_Value");
+                        instructions.Insert(i, CodeInstruction.LoadField(typeof(PlayerTweaks.Configs), nameof(PlayerTweaks.Configs.SprintMultiplierDecrease)));
                         patchedSprintMultiDecrease = true;
                         continue;
                     }
