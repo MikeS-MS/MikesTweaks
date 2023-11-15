@@ -6,6 +6,7 @@ Mod for Lethal Company with multiple tweaks to make the game better
 - You will need BepinEx to use this mod, which you can check how to get and install from [here](https://www.example.com) (this message will stay here until BepinEx for Lethal Company has been released on the Thunderstore so I can add it as a dependency and it automatically downloads)
 
 # These are the default tweaks that are adjustable from the config file:
+## Info
   - Config File is located at (GAME_DIRECTORY/BepinEx/configs/mikes.lethalcompany.mikestweaks.cfg)
   - (Synced) means that the configs in that category will be synchronized from the host to every client that joins their lobby.
   - (Individual) means that the configs in that category will not be synchronized from the host to every client that joins their lobby.
@@ -27,6 +28,7 @@ Mod for Lethal Company with multiple tweaks to make the game better
 ## 3. Player Keybinds (Individual)
   - Hotbar slots: 1-9 keyboard keys
   - Emotes: Y and U keys
+  - Push To Talk button can be bound to Mouse buttons now inside the Game's Settings Meu
 ## 4. Player Sprint (Synced)
   - Sprint Longevity: 12 (was 5)
   - Stamina Drain from jump: 0.04 (was 0.08)
@@ -45,3 +47,4 @@ Mod for Lethal Company with multiple tweaks to make the game better
 
  # Known Issues
  - Going past 7 slots (i.e ExtraSlotsAmount = 3 in the config) is generally not a good idea as the slots will go off screen depending on your resolution. Will look into providing better support for this in the future.
+ - Be careful not to bind your Push To Talk to your main mouse buttons (left, middle, right) because it might remove the binding from the original actions that happen when those are clicked (like clicking on UI elements for example)

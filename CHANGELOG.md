@@ -1,6 +1,7 @@
-# Version 1.4.1
+# Version 1.4.2
 **Added**
  - Switching between item slots will now properly sync to other players with the mod. This cannot work for people without the mod due to the original game's code.
+ - The Push To Talk key can be bound to mouse buttons.
  
 # Version 1.4
 **Added**
@@ -11,5 +12,3 @@
 **Added**
  - A way to bind hotbar slots (bound by default to 1-9 keys)
  - A way to bind emotes (bound by default to Y and U keys)
-
-As always everything is configurable.
