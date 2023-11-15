@@ -3,7 +3,7 @@ Mod for Lethal Company with multiple tweaks to make the game better
 
 # Requirements
 - It's a good idea for everyone that will join your lobby to have this mod installed as well and have the same version. Not having the mod and joining someone who does might result in unexpected behaviour and bugs.
-- You will need BepinEx to use this mod, which you can check how to get and install from [here](https://www.example.com) (this message will stay here until BepinEx for Lethal Company has been released on the Thunderstore so I can add it as a dependency and it automatically downloads)
+- You will need BepinEx to use this mod, which you can check how to get and install from [here](https://github.com/LethalCompany/LethalCompanyModdingWiki/wiki/Installing-mods) (this message will stay here until BepinEx for Lethal Company has been released on the Thunderstore so I can add it as a dependency and it automatically downloads)
 
 # These are the default tweaks that are adjustable from the config file:
 ## Info
@@ -28,7 +28,7 @@ Mod for Lethal Company with multiple tweaks to make the game better
 ## 3. Player Keybinds (Individual)
   - Hotbar slots: 1-9 keyboard keys
   - Emotes: Y and U keys
-  - Push To Talk button can be bound to Mouse buttons now inside the Game's Settings Meu
+  - Push To Talk button can be bound to Mouse buttons now inside the Game's Settings Menu
 ## 4. Player Sprint (Synced)
   - Sprint Longevity: 12 (was 5)
   - Stamina Drain from jump: 0.04 (was 0.08)
