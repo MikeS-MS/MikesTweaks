@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using HarmonyLib;
-using MikesTweaks.Scripts.Player;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
@@ -33,6 +33,29 @@ namespace MikesTweaks.Scripts.Networking
         private List<Func<FastBufferReader, FastBufferReader>> ConfigSetters = new List<Func<FastBufferReader, FastBufferReader>>();
         private List<Func<FastBufferWriter, FastBufferWriter>> ConfigGetters = new List<Func<FastBufferWriter, FastBufferWriter>>();
 
+        public static byte[] ToBytes(object obj)
+        {
+            if (obj == null)
+                return null;
+
+            BinaryFormatter bf = new BinaryFormatter();
+            MemoryStream ms = new MemoryStream();
+
+            bf.Serialize(ms, obj);
+
+            return ms.ToArray();
+        }
+
+        public static object ToObject(byte[] bytes)
+        {
+            MemoryStream ms = new MemoryStream();
+            BinaryFormatter bf = new BinaryFormatter();
+            ms.Write(bytes, 0, bytes.Length);
+            ms.Seek(0, SeekOrigin.Begin);
+            return bf.Deserialize(ms);
+        }
+
+
         public void AddConfigSizeGetter(Func<int> SizeGetter)
         {
             ConfigSizeGetters.Add(SizeGetter);
@@ -57,16 +80,36 @@ namespace MikesTweaks.Scripts.Networking
 
         public void RequestConfigs()
         {
-            FastBufferWriter writer = new FastBufferWriter(0, Allocator.Temp);
             CustomMessagingManager manager = NetworkManager.Singleton.CustomMessagingManager;
 
-            manager.SendNamedMessage(RequestChannelName, 0, writer, NetworkDelivery.Reliable);
+            byte[] versionAsBytes = ToBytes(MikesTweaks.Version);
+            FastBufferWriter writer = new FastBufferWriter(FastBufferWriter.GetWriteSize(versionAsBytes), Allocator.Temp);
+
+            using (writer)
+            {
+                writer.WriteValueSafe(versionAsBytes);
+                manager.SendNamedMessage(RequestChannelName, 0, writer, NetworkDelivery.Reliable);
+            }
         }
 
         public void ReceiveRequestConfigs(ulong senderID, FastBufferReader payload)
         {
             if (!NetworkManager.Singleton.IsServer)
                 return;
+
+            if (payload.Length <= 8)
+            {
+                //StartOfRound.Instance.KickPlayer((int)senderID);
+                return;
+            }
+
+            payload.ReadValueSafe(out byte[] versionAsBytes);
+
+            if ((string)ToObject(versionAsBytes) != MikesTweaks.Version)
+            {
+                //StartOfRound.Instance.KickPlayer((int)senderID);
+                return;
+            }
 
             SendConfigs(senderID);
         }
@@ -109,49 +152,6 @@ namespace MikesTweaks.Scripts.Networking
             }
 
             manager.SendNamedMessage(SyncChannelName, clientID, writer, NetworkDelivery.Reliable);
-        }
-    }
-
-    [HarmonyPatch(typeof(NetworkManager))]
-    public static class NetworkManager_Patches
-    {
-        [HarmonyPatch("StartHost")]
-        [HarmonyPostfix]
-        private static void StartHost_Post(GameNetworkManager __instance)
-        {
-            ConfigsSynchronizer.Instance.RegisterMessages();
-        }
-
-        [HarmonyPatch("StartClient")]
-        [HarmonyPostfix]
-        private static void StartClient_Post(GameNetworkManager __instance)
-        {
-            ConfigsSynchronizer.Instance.RegisterMessages();
-        }
-    }
-
-
-    [HarmonyPatch(typeof(StartOfRound))]
-    public static class ConfigsRelated_Patches
-    {
-        [HarmonyPatch(typeof(StartOfRound))]
-        [HarmonyPatch("OnPlayerConnectedClientRpc")]
-        [HarmonyPostfix]
-        private static void OnPlayerConnectedClientRpc(StartOfRound __instance, ulong clientId, int assignedPlayerObjectId)
-        {
-            PlayerTweaks.LocalPlayerController = __instance.allPlayerScripts[assignedPlayerObjectId];
-
-            if (NetworkManager.Singleton.IsServer)
-                return;
-            ConfigsSynchronizer.Instance.RequestConfigs();
-        }
-
-        [HarmonyPatch(typeof(MenuManager))]
-        [HarmonyPatch("Start")]
-        [HarmonyPostfix]
-        private static void MenuManager_Start(MenuManager __instance)
-        {
-            MikesTweaks.Instance.LoadConfigs();
         }
     }
 }

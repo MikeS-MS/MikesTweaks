@@ -1,8 +1,8 @@
 # MikesTweaks
 Mod for Lethal Company with multiple tweaks to make the game better
 
-# NOTE:
-- You don't need to download 1.4.3 if you have 1.4.2, because the actual version of the mod is still 1.4.2 in both.
+# IMPORTANT for people updating from a version before 1.5
+ - I've renamed a few configs so it's best to delete the config file you have and let it regenerate by launching the game and change the configs back to your liking.
 
 # Requirements
 - It's a good idea for everyone that will join your lobby to have this mod installed as well and have the same version. Not having the mod and joining someone who does might result in unexpected behaviour and bugs.
@@ -10,6 +10,7 @@ Mod for Lethal Company with multiple tweaks to make the game better
 
 # These are the default tweaks that are adjustable from the config file:
 ## Info
+  - For more detailed information on the config options check the config file.
   - Config File is located at (GAME_DIRECTORY/BepinEx/configs/mikes.lethalcompany.mikestweaks.cfg)
   - (Synced) means that the configs in that category will be synchronized from the host to every client that joins their lobby.
   - (Individual) means that the configs in that category will not be synchronized from the host to every client that joins their lobby.
@@ -32,15 +33,21 @@ Mod for Lethal Company with multiple tweaks to make the game better
   - Hotbar slots: 1-9 keyboard keys
   - Emotes: Y and U keys
   - Push To Talk button can be bound to Mouse buttons now inside the Game's Settings Menu
+  - Flashlight Keybind: F
 ## 4. Player Sprint (Synced)
-  - Sprint Longevity: 12 (was 5)
+  - Sprint Stamina: 12 (was 5)
   - Stamina Drain from jump: 0.04 (was 0.08)
-  - Default Sprint Multiplier value: 1.5 (was 1)
-  - Max Sprint Multiplier Value: 3 (was 2.25)
-  - Sprint Multiplier Increase: 1 (was 1)
-  - Sprint Multiplier Decrease: 10 (was 10)
-## 5. World Time Speed (Synced)
-  - Speed: 0.5 (was 1)
+  - Default Sprint Speed value: 1.5 (was 1)
+  - Max Sprint Speed Value: 3 (was 2.25)
+  - Sprint Speed Increase: 1 (was 1)
+  - Sprint Speed Decrease: 10 (was 10)
+  - Stamina Recharge Rate: 5 (was 1)
+  - Stamina Recharge Weight while walking: 9 (was 9)
+  - Stamina Recharge Weight while standing still: 4 (was 4)
+## 5. World Settings (Synced)
+  - Time Speed: 0.5 (was 1)
+## 6. Game Rules (Synced)
+  - Allow Flashlight Keybind (allows/disallows using the quick-use Flashlight keybind for everyone): true (vanilla: false)
 
 # Network additions
  - When switching to another slot using the hotkeys it will properly sync which slot/item you're holding to the other people in the lobby.

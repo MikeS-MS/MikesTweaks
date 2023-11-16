@@ -8,11 +8,13 @@ using BepInEx.Logging;
 using GameNetcodeStuff;
 using HarmonyLib;
 using MikesTweaks.Scripts.Inventory;
-using MikesTweaks.Scripts.Networking;
+using MikesTweaks.Scripts.Items;
 using MikesTweaks.Scripts.Player;
+using MikesTweaks.Scripts.Systems;
 using MikesTweaks.Scripts.World;
 using Unity.Collections;
 using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.UIElements.Internal;
 
 namespace MikesTweaks.Scripts
@@ -22,7 +24,7 @@ namespace MikesTweaks.Scripts
     {
         public const string GUID = "mikes.lethalcompany.mikestweaks";
         public const string Name = "Mike's Tweaks";
-        public const string Version = "1.4.2";
+        public const string Version = "1.5";
         public static ManualLogSource Log = null;
         public static MikesTweaks Instance { get; private set; } = null;
 
@@ -40,17 +42,19 @@ namespace MikesTweaks.Scripts
         {
             Instance = this;
             Log = Logger;
-            InventoryTweaks.RegisterConfigs(Config);
-            PlayerTweaks.RegisterConfigs(Config);
             WorldTweaks.RegisterConfigs(Config);
+            PlayerTweaks.RegisterConfigs(Config);
+            InventoryTweaks.RegisterConfigs(Config);
             Config.SaveOnConfigSet = false;
 
+            Harmony.CreateAndPatchAll(typeof(MenuManager_Patches));
+            Harmony.CreateAndPatchAll(typeof(IngamePlayerSettings_Patches));
+            Harmony.CreateAndPatchAll(typeof(HUDManager_Patches));
             Harmony.CreateAndPatchAll(typeof(NetworkManager_Patches));
-            Harmony.CreateAndPatchAll(typeof(ConfigsRelated_Patches));
-            Harmony.CreateAndPatchAll(typeof(PlayerTweaks));
+            Harmony.CreateAndPatchAll(typeof(StartOfRound_Patches));
+            Harmony.CreateAndPatchAll(typeof(TimeOfDay_Patches));
             Harmony.CreateAndPatchAll(typeof(PlayerControllerB_Patches));
-            Harmony.CreateAndPatchAll(typeof(InventoryTweaks));
-            Harmony.CreateAndPatchAll(typeof(WorldTweaks));
+            Harmony.CreateAndPatchAll(typeof(GrabbableObject_Patches));
 
             Logger.LogInfo($"Plugin {GUID} is loaded!");
         }

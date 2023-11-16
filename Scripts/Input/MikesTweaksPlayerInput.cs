@@ -6,14 +6,14 @@ using UnityEngine.InputSystem.Utilities;
 
 namespace MikesTweaks.Scripts.Input
 {
-    public partial class @PlayerHotbarInput : IInputActionCollection2, IDisposable
+    public partial class @MikesTweaksPlayerInput : IInputActionCollection2, IDisposable
     {
         public InputActionAsset asset { get; }
 
-        public @PlayerHotbarInput()
+        public @MikesTweaksPlayerInput()
         {
             asset = InputActionAsset.FromJson(@"{
-    ""name"": ""PlayerHotbarInput"",
+    ""name"": ""MikesTweaksPlayerInput"",
     ""maps"": [
         {
             ""name"": ""Hotbar"",
@@ -25,7 +25,7 @@ namespace MikesTweaks.Scripts.Input
                     ""id"": ""afdaf0de-d9cb-4835-93df-06ff8a407e18"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Press"",
+                    ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
@@ -34,7 +34,7 @@ namespace MikesTweaks.Scripts.Input
                     ""id"": ""1cf91964-9e69-4db5-90ae-65b813acbceb"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Press"",
+                    ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
@@ -43,7 +43,7 @@ namespace MikesTweaks.Scripts.Input
                     ""id"": ""9787ab53-1dcb-439c-91cb-683e0e6e0fc2"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Press"",
+                    ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
@@ -52,7 +52,7 @@ namespace MikesTweaks.Scripts.Input
                     ""id"": ""a63eb6ea-bced-4246-a625-439815fb3c86"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Press"",
+                    ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
@@ -61,7 +61,7 @@ namespace MikesTweaks.Scripts.Input
                     ""id"": ""8810962b-a9c4-4244-9202-05886a4dd217"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Press"",
+                    ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
@@ -70,7 +70,7 @@ namespace MikesTweaks.Scripts.Input
                     ""id"": ""4e4ccd85-b20d-422d-836a-6c30d64e8ada"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Press"",
+                    ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
@@ -79,7 +79,7 @@ namespace MikesTweaks.Scripts.Input
                     ""id"": ""cc6d7e8c-4c89-4a7f-8f69-07d40af41569"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Press"",
+                    ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
@@ -88,7 +88,7 @@ namespace MikesTweaks.Scripts.Input
                     ""id"": ""71e7f8d9-ddd6-45de-acdb-0e427b5cf883"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Press"",
+                    ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
@@ -97,7 +97,25 @@ namespace MikesTweaks.Scripts.Input
                     ""id"": ""9f3aee6a-4474-4e45-895f-4384d31e2651"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Press"",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FlashlightToggle"",
+                    ""type"": ""Button"",
+                    ""id"": ""8b3dca3f-50e1-4bb9-9d22-cb56d9486b78"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""WalkieTalkieSpeak"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""1f791eab-e066-4ffe-89cf-4ea0362c9cb8"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
                     ""initialStateCheck"": false
                 }
             ],
@@ -200,6 +218,28 @@ namespace MikesTweaks.Scripts.Input
                     ""action"": ""Hotbar9"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""27f1b785-d544-447f-b0ec-29635c1ea7d4"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FlashlightToggle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1a2470b7-773e-4327-99f9-36648dae43ef"",
+                    ""path"": ""<Keyboard>/h"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""WalkieTalkieSpeak"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -217,6 +257,8 @@ namespace MikesTweaks.Scripts.Input
             m_Hotbar_Hotbar7 = m_Hotbar.FindAction("Hotbar7", throwIfNotFound: true);
             m_Hotbar_Hotbar8 = m_Hotbar.FindAction("Hotbar8", throwIfNotFound: true);
             m_Hotbar_Hotbar9 = m_Hotbar.FindAction("Hotbar9", throwIfNotFound: true);
+            m_Hotbar_FlashlightToggle = m_Hotbar.FindAction("FlashlightToggle", throwIfNotFound: true);
+            m_Hotbar_WalkieTalkieSpeak = m_Hotbar.FindAction("WalkieTalkieSpeak", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -287,12 +329,14 @@ namespace MikesTweaks.Scripts.Input
         private readonly InputAction m_Hotbar_Hotbar7;
         private readonly InputAction m_Hotbar_Hotbar8;
         private readonly InputAction m_Hotbar_Hotbar9;
+        private readonly InputAction m_Hotbar_FlashlightToggle;
+        private readonly InputAction m_Hotbar_WalkieTalkieSpeak;
 
         public struct HotbarActions
         {
-            private @PlayerHotbarInput m_Wrapper;
+            private @MikesTweaksPlayerInput m_Wrapper;
 
-            public HotbarActions(@PlayerHotbarInput wrapper)
+            public HotbarActions(@MikesTweaksPlayerInput wrapper)
             {
                 m_Wrapper = wrapper;
             }
@@ -306,6 +350,8 @@ namespace MikesTweaks.Scripts.Input
             public InputAction @Hotbar7 => m_Wrapper.m_Hotbar_Hotbar7;
             public InputAction @Hotbar8 => m_Wrapper.m_Hotbar_Hotbar8;
             public InputAction @Hotbar9 => m_Wrapper.m_Hotbar_Hotbar9;
+            public InputAction @FlashlightToggle => m_Wrapper.m_Hotbar_FlashlightToggle;
+            public InputAction @WalkieTalkieSpeak => m_Wrapper.m_Hotbar_WalkieTalkieSpeak;
 
             public InputActionMap Get()
             {
@@ -360,6 +406,12 @@ namespace MikesTweaks.Scripts.Input
                 @Hotbar9.started += instance.OnHotbar9;
                 @Hotbar9.performed += instance.OnHotbar9;
                 @Hotbar9.canceled += instance.OnHotbar9;
+                @FlashlightToggle.started += instance.OnFlashlightToggle;
+                @FlashlightToggle.performed += instance.OnFlashlightToggle;
+                @FlashlightToggle.canceled += instance.OnFlashlightToggle;
+                @WalkieTalkieSpeak.started += instance.OnWalkieTalkieSpeak;
+                @WalkieTalkieSpeak.performed += instance.OnWalkieTalkieSpeak;
+                @WalkieTalkieSpeak.canceled += instance.OnWalkieTalkieSpeak;
             }
 
             private void UnregisterCallbacks(IHotbarActions instance)
@@ -391,6 +443,12 @@ namespace MikesTweaks.Scripts.Input
                 @Hotbar9.started -= instance.OnHotbar9;
                 @Hotbar9.performed -= instance.OnHotbar9;
                 @Hotbar9.canceled -= instance.OnHotbar9;
+                @FlashlightToggle.started -= instance.OnFlashlightToggle;
+                @FlashlightToggle.performed -= instance.OnFlashlightToggle;
+                @FlashlightToggle.canceled -= instance.OnFlashlightToggle;
+                @WalkieTalkieSpeak.started -= instance.OnWalkieTalkieSpeak;
+                @WalkieTalkieSpeak.performed -= instance.OnWalkieTalkieSpeak;
+                @WalkieTalkieSpeak.canceled -= instance.OnWalkieTalkieSpeak;
             }
 
             public void RemoveCallbacks(IHotbarActions instance)
@@ -421,6 +479,8 @@ namespace MikesTweaks.Scripts.Input
             void OnHotbar7(InputAction.CallbackContext context);
             void OnHotbar8(InputAction.CallbackContext context);
             void OnHotbar9(InputAction.CallbackContext context);
+            void OnFlashlightToggle(InputAction.CallbackContext context);
+            void OnWalkieTalkieSpeak(InputAction.CallbackContext context);
         }
     }
 }

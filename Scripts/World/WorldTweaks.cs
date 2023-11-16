@@ -18,7 +18,7 @@ namespace MikesTweaks.Scripts.World
             public static string WorldTweaksSectionHeader => "WorldTweaks";
 
             public static ConfigEntrySettings<float> GlobalTimeSpeedMulti =
-                new ConfigEntrySettings<float>("GlobalTimeSpeedMultiplier", 0.5f, 1f);
+                new ConfigEntrySettings<float>("GlobalTimeSpeedMultiplier", 0.5f, 1f, "Think of this as a percentage, the lower it is, the slower the time goes by, the higher it is, the faster time passes.");
         }
 
         public static void RegisterConfigs(ConfigFile config)
@@ -49,13 +49,6 @@ namespace MikesTweaks.Scripts.World
         public static void ReapplyConfigs(TimeOfDay timeOfDay)
         {
             timeOfDay.globalTimeSpeedMultiplier = Configs.GlobalTimeSpeedMulti.Value;
-        }
-
-        [HarmonyPatch(typeof(TimeOfDay), "Start")]
-        [HarmonyPostfix]
-        private static void ChangeTimeSpeedMultiplier(TimeOfDay __instance)
-        {
-            ReapplyConfigs(__instance);
         }
     }
 }
