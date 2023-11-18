@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using HarmonyLib;
 using MikesTweaks.Scripts.Inventory;
+using MikesTweaks.Scripts.World;
 
 namespace MikesTweaks.Scripts.Items
 {
@@ -21,7 +22,7 @@ namespace MikesTweaks.Scripts.Items
 
             if (index == -1) return;
 
-            __instance.itemProperties.weight = (((float)InventoryTweaks.Configs.TerminalItemWeights[index].Value) / 100f) + 1f;
+            __instance.itemProperties.weight = (((float)InventoryTweaks.Configs.TerminalItemWeights[index].Value(WorldTweaks.Configs.UseVanillaTerminalItemWeights.Value())) / 100f) + 1f;
 
         }
     }

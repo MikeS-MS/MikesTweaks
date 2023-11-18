@@ -19,6 +19,7 @@ using System.Reflection.Emit;
 using Dissonance.Integrations.Unity_NFGO;
 using MikesTweaks.Scripts.Networking;
 using MikesTweaks.Scripts.Systems;
+using MikesTweaks.Scripts.World;
 using Unity.Collections;
 using Unity.Netcode;
 using static UnityEngine.UI.GridLayoutGroup;
@@ -31,10 +32,6 @@ namespace MikesTweaks.Scripts.Player
         public static class Configs
         {
             public static string PlayerTweaksSectionHeader => "PlayerTweaks";
-
-            public static ConfigEntrySettings<bool> AllowFlashlightKeybind =
-                new ConfigEntrySettings<bool>("AllowFlashlightKeybind", true, false,
-                    "Set this to false if you don't want people who join your lobby to be able to use the keybind and true if you want them to be able to.");
 
             public static ConfigEntrySettings<float> MaxStamina =
                 new ConfigEntrySettings<float>("MaxStamina", 12, 5, "This is the maximum amount of time you can run.\nThe higher the number, the longer you can run for.");
@@ -104,33 +101,30 @@ namespace MikesTweaks.Scripts.Player
             MikesTweaks.Instance.BindConfig(ref Configs.StaminaWeightWhileWalking, Configs.PlayerTweaksSectionHeader);
             MikesTweaks.Instance.BindConfig(ref Configs.StaminaWeightWhileStandingStill, Configs.PlayerTweaksSectionHeader);
             MikesTweaks.Instance.BindConfig(ref Configs.JumpStaminaDrain, Configs.PlayerTweaksSectionHeader);
-
-            MikesTweaks.Instance.BindConfig(ref Configs.AllowFlashlightKeybind, Configs.KeybindsSectionHeader);
+            
             MikesTweaks.Instance.BindConfig(ref Configs.FlashlightKeybind, Configs.KeybindsSectionHeader);
-
             for (int i = 0; i < Configs.SlotKeybinds.Length; i++)
                 MikesTweaks.Instance.BindConfig(ref Configs.SlotKeybinds[i], Configs.KeybindsSectionHeader);
-
             for (int i = 0; i < Configs.EmoteKeybinds.Length; i++)
                 MikesTweaks.Instance.BindConfig(ref Configs.EmoteKeybinds[i], Configs.KeybindsSectionHeader);
 
             ConfigsSynchronizer.OnConfigsChangedDelegate += () => ReapplyConfigs(LocalPlayerController, true, true);
             ConfigsSynchronizer.Instance.AddConfigGetter(WriteConfigsToWriter);
             ConfigsSynchronizer.Instance.AddConfigSetter(ReadConfigChanges);
-            ConfigsSynchronizer.Instance.AddConfigSizeGetter(() => (sizeof(float) * 9) + sizeof(bool));
+            ConfigsSynchronizer.Instance.AddConfigSizeGetter(() => (sizeof(float) * 9));
         }
         public static FastBufferWriter WriteConfigsToWriter(FastBufferWriter writer)
         {
-            writer.WriteValueSafe(Configs.MaxStamina.Value);
-            writer.WriteValueSafe(Configs.DefaultSprintSpeed.Value);
-            writer.WriteValueSafe(Configs.SprintSpeedIncreasePerFrame.Value);
-            writer.WriteValueSafe(Configs.SprintSpeedDecreasePerFrame.Value);
-            writer.WriteValueSafe(Configs.MaxSprintSpeed.Value);
-            writer.WriteValueSafe(Configs.StaminaRechargePerFrame.Value);
-            writer.WriteValueSafe(Configs.StaminaWeightWhileWalking.Value);
-            writer.WriteValueSafe(Configs.StaminaWeightWhileStandingStill.Value);
-            writer.WriteValueSafe(Configs.JumpStaminaDrain.Value);
-            writer.WriteValueSafe(Configs.AllowFlashlightKeybind.Value);
+            writer.WriteValueSafe(Configs.DefaultSprintSpeed.Value(WorldTweaks.Configs.UseVanillaSprintSpeedValues.Value()));
+            writer.WriteValueSafe(Configs.SprintSpeedIncreasePerFrame.Value(WorldTweaks.Configs.UseVanillaSprintSpeedValues.Value()));
+            writer.WriteValueSafe(Configs.SprintSpeedDecreasePerFrame.Value(WorldTweaks.Configs.UseVanillaSprintSpeedValues.Value()));
+            writer.WriteValueSafe(Configs.MaxSprintSpeed.Value(WorldTweaks.Configs.UseVanillaSprintSpeedValues.Value()));
+
+            writer.WriteValueSafe(Configs.MaxStamina.Value(WorldTweaks.Configs.UseVanillaStaminaValues.Value()));
+            writer.WriteValueSafe(Configs.StaminaRechargePerFrame.Value(WorldTweaks.Configs.UseVanillaStaminaValues.Value()));
+            writer.WriteValueSafe(Configs.StaminaWeightWhileWalking.Value(WorldTweaks.Configs.UseVanillaStaminaValues.Value()));
+            writer.WriteValueSafe(Configs.StaminaWeightWhileStandingStill.Value(WorldTweaks.Configs.UseVanillaStaminaValues.Value()));
+            writer.WriteValueSafe(Configs.JumpStaminaDrain.Value(WorldTweaks.Configs.UseVanillaStaminaValues.Value()));
 
             return writer;
         }
@@ -138,9 +132,6 @@ namespace MikesTweaks.Scripts.Player
         public static FastBufferReader ReadConfigChanges(FastBufferReader payload)
         {
             payload.ReadValue(out float Value);
-            Configs.MaxStamina.Entry.Value = Value;
-
-            payload.ReadValue(out Value);
             Configs.DefaultSprintSpeed.Entry.Value = Value;
 
             payload.ReadValue(out Value);
@@ -151,6 +142,9 @@ namespace MikesTweaks.Scripts.Player
 
             payload.ReadValue(out Value);
             Configs.MaxSprintSpeed.Entry.Value = Value;
+
+            payload.ReadValue(out Value);
+            Configs.MaxStamina.Entry.Value = Value;
 
             payload.ReadValue(out Value);
             Configs.StaminaRechargePerFrame.Entry.Value = Value;
@@ -164,20 +158,18 @@ namespace MikesTweaks.Scripts.Player
             payload.ReadValue(out Value);
             Configs.JumpStaminaDrain.Entry.Value = Value;
 
-            payload.ReadValue(out bool BoolValue);
-            Configs.AllowFlashlightKeybind.Entry.Value = BoolValue;
-
             return payload;
         }
 
         public static void ReapplyConfigs(PlayerControllerB player, bool force = false, bool updateHud = false)
         {
-            player.sprintTime = Configs.MaxStamina.Value;
+            player.sprintTime = Configs.MaxStamina.Value(WorldTweaks.Configs.UseVanillaStaminaValues.Value());
             InventoryTweaks.ChangeItemSlotsAmount(player, force);
 
             if (updateHud)
                 HUDManager_Patches.ChangeItemSlotsAmountUI(HUDManager.Instance);
         }
+
         public static void RegisterSwitchSlotMessage()
         {
             NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(PlayerSwitchSlotChannel, ReceiveSwitchSlot);
@@ -228,12 +220,12 @@ namespace MikesTweaks.Scripts.Player
 
         public static float StaminaRechargeMovementNotHinderedWalking(PlayerControllerB player, float num2)
         {
-            return Mathf.Clamp(player.sprintMeter + (Time.deltaTime * Configs.StaminaRechargePerFrame.Value) / (player.sprintTime + Configs.StaminaWeightWhileWalking.Value) * num2, 0f, 1f);
+            return Mathf.Clamp(player.sprintMeter + (Time.deltaTime * Configs.StaminaRechargePerFrame.Value(WorldTweaks.Configs.UseVanillaStaminaValues.Value())) / (player.sprintTime + Configs.StaminaWeightWhileWalking.Value(WorldTweaks.Configs.UseVanillaStaminaValues.Value())) * num2, 0f, 1f);
         }
 
         public static float StaminaRechargeMovementNotHinderedNotWalking(PlayerControllerB player, float num2)
         {
-            return Mathf.Clamp(player.sprintMeter + (Time.deltaTime * Configs.StaminaRechargePerFrame.Value)/ (player.sprintTime + Configs.StaminaWeightWhileStandingStill.Value) * num2, 0f, 1f);
+            return Mathf.Clamp(player.sprintMeter + (Time.deltaTime * Configs.StaminaRechargePerFrame.Value(WorldTweaks.Configs.UseVanillaStaminaValues.Value()))/ (player.sprintTime + Configs.StaminaWeightWhileStandingStill.Value(WorldTweaks.Configs.UseVanillaStaminaValues.Value())) * num2, 0f, 1f);
         }
 
         public static bool IsLocallyControlled(PlayerControllerB player)

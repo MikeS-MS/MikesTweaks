@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using MikesTweaks.Scripts.World;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
@@ -142,44 +143,42 @@ namespace MikesTweaks.Scripts.Player
             input.Enable();
 
             input.Hotbar.Hotbar1.ChangeBinding(0).Erase();
-            input.Hotbar.Hotbar1.AddBinding(PlayerTweaks.Configs.SlotKeybinds[0].Value);
+            input.Hotbar.Hotbar1.AddBinding(PlayerTweaks.Configs.SlotKeybinds[0].Value());
 
             input.Hotbar.Hotbar2.ChangeBinding(0).Erase();
-            input.Hotbar.Hotbar2.AddBinding(PlayerTweaks.Configs.SlotKeybinds[1].Value);
+            input.Hotbar.Hotbar2.AddBinding(PlayerTweaks.Configs.SlotKeybinds[1].Value());
 
             input.Hotbar.Hotbar3.ChangeBinding(0).Erase();
-            input.Hotbar.Hotbar3.AddBinding(PlayerTweaks.Configs.SlotKeybinds[2].Value);
+            input.Hotbar.Hotbar3.AddBinding(PlayerTweaks.Configs.SlotKeybinds[2].Value());
 
             input.Hotbar.Hotbar4.ChangeBinding(0).Erase();
-            input.Hotbar.Hotbar4.AddBinding(PlayerTweaks.Configs.SlotKeybinds[3].Value);
+            input.Hotbar.Hotbar4.AddBinding(PlayerTweaks.Configs.SlotKeybinds[3].Value());
 
             input.Hotbar.Hotbar5.ChangeBinding(0).Erase();
-            input.Hotbar.Hotbar5.AddBinding(PlayerTweaks.Configs.SlotKeybinds[4].Value);
+            input.Hotbar.Hotbar5.AddBinding(PlayerTweaks.Configs.SlotKeybinds[4].Value());
 
             input.Hotbar.Hotbar6.ChangeBinding(0).Erase();
-            input.Hotbar.Hotbar6.AddBinding(PlayerTweaks.Configs.SlotKeybinds[5].Value);
+            input.Hotbar.Hotbar6.AddBinding(PlayerTweaks.Configs.SlotKeybinds[5].Value());
 
             input.Hotbar.Hotbar7.ChangeBinding(0).Erase();
-            input.Hotbar.Hotbar7.AddBinding(PlayerTweaks.Configs.SlotKeybinds[6].Value);
+            input.Hotbar.Hotbar7.AddBinding(PlayerTweaks.Configs.SlotKeybinds[6].Value());
 
             input.Hotbar.Hotbar8.ChangeBinding(0).Erase();
-            input.Hotbar.Hotbar8.AddBinding(PlayerTweaks.Configs.SlotKeybinds[7].Value);
+            input.Hotbar.Hotbar8.AddBinding(PlayerTweaks.Configs.SlotKeybinds[7].Value());
 
             input.Hotbar.Hotbar9.ChangeBinding(0).Erase();
-            input.Hotbar.Hotbar9.AddBinding(PlayerTweaks.Configs.SlotKeybinds[8].Value);
+            input.Hotbar.Hotbar9.AddBinding(PlayerTweaks.Configs.SlotKeybinds[8].Value());
 
             input.Hotbar.FlashlightToggle.ChangeBinding(0).Erase();
-            input.Hotbar.FlashlightToggle.AddBinding(PlayerTweaks.Configs.FlashlightKeybind.Value);
+            input.Hotbar.FlashlightToggle.AddBinding(PlayerTweaks.Configs.FlashlightKeybind.Value());
         }
 
         private void ToggleFlashlight()
         {
-            if (!PlayerTweaks.Configs.AllowFlashlightKeybind.Value)
+            if (!WorldTweaks.Configs.AllowFlashlightKeybind.Value())
                 return;
 
-            //object[] args = Array.Empty<object>();
             bool canUseItem = PlayerTweaks.CanUseItem(owner);
-            //bool canUseItem = (bool)typeof(PlayerControllerB).GetMethod("CanUseItem", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(owner, args);
             if (!canUseItem)
                 return;
 
@@ -213,7 +212,7 @@ namespace MikesTweaks.Scripts.Player
 
         private void RequestSlotChange(int slot)
         {
-            if (!PlayerTweaks.CanSwitchSlot(owner))
+            if (!PlayerTweaks.CanSwitchSlot(owner) || !WorldTweaks.Configs.AllowHotbarKeybinds.Value())
                 return;
 
             SwitchToSlot(slot);

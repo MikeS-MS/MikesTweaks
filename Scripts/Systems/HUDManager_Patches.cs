@@ -26,17 +26,17 @@ namespace MikesTweaks.Scripts.Systems
 
                 Object.Destroy(child.gameObject);
             }
-            if (InventoryTweaks.Configs.ExtraItemSlotsAmount.Value == 0)
+            if (InventoryTweaks.Configs.ExtraItemSlotsAmount.Value() == 0)
                 return;
 
             // Prepare the arrays
-            Image[] ItemSlotIconFrames = new Image[4 + InventoryTweaks.Configs.ExtraItemSlotsAmount.Value];
+            Image[] ItemSlotIconFrames = new Image[4 + InventoryTweaks.Configs.ExtraItemSlotsAmount.Value()];
             ItemSlotIconFrames[0] = HUDManager.Instance.itemSlotIconFrames[0];
             ItemSlotIconFrames[1] = HUDManager.Instance.itemSlotIconFrames[1];
             ItemSlotIconFrames[2] = HUDManager.Instance.itemSlotIconFrames[2];
             ItemSlotIconFrames[3] = HUDManager.Instance.itemSlotIconFrames[3];
 
-            Image[] ItemSlotIcons = new Image[4 + InventoryTweaks.Configs.ExtraItemSlotsAmount.Value];
+            Image[] ItemSlotIcons = new Image[4 + InventoryTweaks.Configs.ExtraItemSlotsAmount.Value()];
             ItemSlotIcons[0] = HUDManager.Instance.itemSlotIcons[0];
             ItemSlotIcons[1] = HUDManager.Instance.itemSlotIcons[1];
             ItemSlotIcons[2] = HUDManager.Instance.itemSlotIcons[2];
@@ -46,7 +46,7 @@ namespace MikesTweaks.Scripts.Systems
             GameObject CurrentSlot = Slot4;
 
             // Spawn more UI slots.
-            for (int i = 0; i < InventoryTweaks.Configs.ExtraItemSlotsAmount.Value; i++)
+            for (int i = 0; i < InventoryTweaks.Configs.ExtraItemSlotsAmount.Value(); i++)
             {
                 GameObject NewSlot = Object.Instantiate(Slot4);
                 NewSlot.name = $"Slot{3 + (i + 1)}";

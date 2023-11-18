@@ -7,6 +7,7 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using GameNetcodeStuff;
 using HarmonyLib;
+using MikesTweaks.Scripts.Environment;
 using MikesTweaks.Scripts.Inventory;
 using MikesTweaks.Scripts.Items;
 using MikesTweaks.Scripts.Player;
@@ -24,7 +25,7 @@ namespace MikesTweaks.Scripts
     {
         public const string GUID = "mikes.lethalcompany.mikestweaks";
         public const string Name = "Mike's Tweaks";
-        public const string Version = "1.5";
+        public const string Version = "1.6";
         public static ManualLogSource Log = null;
         public static MikesTweaks Instance { get; private set; } = null;
 
@@ -53,6 +54,8 @@ namespace MikesTweaks.Scripts
             Harmony.CreateAndPatchAll(typeof(NetworkManager_Patches));
             Harmony.CreateAndPatchAll(typeof(StartOfRound_Patches));
             Harmony.CreateAndPatchAll(typeof(TimeOfDay_Patches));
+            Harmony.CreateAndPatchAll(typeof(InteractTrigger_Patches));
+            Harmony.CreateAndPatchAll(typeof(Terminal_Patches));
             Harmony.CreateAndPatchAll(typeof(PlayerControllerB_Patches));
             Harmony.CreateAndPatchAll(typeof(GrabbableObject_Patches));
 

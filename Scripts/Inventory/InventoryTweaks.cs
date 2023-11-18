@@ -11,6 +11,7 @@ using MikesTweaks.Scripts.Items;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 using MikesTweaks.Scripts.Networking;
+using MikesTweaks.Scripts.World;
 using Unity.Netcode;
 
 namespace MikesTweaks.Scripts.Inventory
@@ -58,7 +59,7 @@ namespace MikesTweaks.Scripts.Inventory
 
         public static FastBufferWriter WriteConfigsToWriter(FastBufferWriter writer)
         {
-            writer.WriteValueSafe(Configs.ExtraItemSlotsAmount.Value);
+            writer.WriteValueSafe(Configs.ExtraItemSlotsAmount.Value());
 
             return writer;
         }
@@ -73,16 +74,16 @@ namespace MikesTweaks.Scripts.Inventory
 
         public static bool HasEnoughSlots(int slotID)
         {
-            return ((Configs.ExtraItemSlotsAmount.Value + 4) - (slotID + 1)) > -1;
+            return ((Configs.ExtraItemSlotsAmount.Value() + 4) - (slotID + 1)) > -1;
         }
 
         public static void ChangeItemSlotsAmount(PlayerControllerB __instance, bool force = false)
         {
             if (!force)
-                if (Configs.ExtraItemSlotsAmount.Value == 0)
+                if (Configs.ExtraItemSlotsAmount.Value() == 0)
                     return;
 
-            __instance.ItemSlots = new GrabbableObject[4 + Configs.ExtraItemSlotsAmount.Value];
+            __instance.ItemSlots = new GrabbableObject[4 + Configs.ExtraItemSlotsAmount.Value()];
         }
 
         public static void ReapplyConfigs()

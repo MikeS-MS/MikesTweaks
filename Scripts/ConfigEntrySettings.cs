@@ -18,7 +18,10 @@ namespace MikesTweaks.Scripts
         }
 
         public Type type => typeof(T);
-        public T Value => Entry.Value;
+        public T Value(bool vanilla = false)
+        {
+            return !vanilla ? Entry.Value : VanillaValue;
+        }
 
         public T DefaultValue { get; private set;}
         public string ConfigName { get; private set; }

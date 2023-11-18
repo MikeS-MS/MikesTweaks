@@ -10,6 +10,7 @@ using System.Reflection.Emit;
 using UnityEngine.InputSystem;
 using BepInEx.Logging;
 using MikesTweaks.Scripts.Networking;
+using MikesTweaks.Scripts.World;
 using Unity.Netcode;
 
 namespace MikesTweaks.Scripts.Player
@@ -27,9 +28,9 @@ namespace MikesTweaks.Scripts.Player
             inputRedirection = __instance.gameObject.GetComponent<PlayerInputRedirection>();
             inputRedirection.BindHotbarSlots();
             __instance.playerActions.Movement.Emote1.ChangeBinding(0).Erase();
-            __instance.playerActions.Movement.Emote1.AddBinding(PlayerTweaks.Configs.EmoteKeybinds[0].Value);
+            __instance.playerActions.Movement.Emote1.AddBinding(PlayerTweaks.Configs.EmoteKeybinds[0].Value());
             __instance.playerActions.Movement.Emote2.ChangeBinding(0).Erase();
-            __instance.playerActions.Movement.Emote2.AddBinding(PlayerTweaks.Configs.EmoteKeybinds[1].Value);
+            __instance.playerActions.Movement.Emote2.AddBinding(PlayerTweaks.Configs.EmoteKeybinds[1].Value());
         }
 
         private static bool InsertStaminaRechargeMovementHinderedWalking(ref List<CodeInstruction> instructions, CodeInstruction instruction, int i, ref List<int> IndexesToRemove)
@@ -161,12 +162,15 @@ namespace MikesTweaks.Scripts.Player
                 if (Math.Abs((float)instruction.operand - JumpDrainValue) > 0.01f)
                     continue;
 
-                toListInstructions[i] = CodeInstruction.Call(typeof(ConfigEntrySettings<float>), "get_Value");
+                toListInstructions[i] = CodeInstruction.Call(typeof(ConfigEntrySettings<float>), nameof(ConfigEntrySettings<float>.Value));
+                toListInstructions.Insert(i, CodeInstruction.Call(typeof(ConfigEntrySettings<bool>), nameof(ConfigEntrySettings<bool>.Value)));
+                toListInstructions.Insert(i, new CodeInstruction(OpCodes.Ldc_I4_0));
+                toListInstructions.Insert(i, CodeInstruction.LoadField(typeof(WorldTweaks.Configs), nameof(WorldTweaks.Configs.UseVanillaStaminaValues)));
                 toListInstructions.Insert(i, CodeInstruction.LoadField(typeof(PlayerTweaks.Configs), nameof(PlayerTweaks.Configs.JumpStaminaDrain)));
                 break;
             }
 
-            return toListInstructions.AsEnumerable();
+            return instructions.AsEnumerable();
         }
 
         [HarmonyPatch("Start")]
@@ -185,11 +189,11 @@ namespace MikesTweaks.Scripts.Player
             PlayerTweaks.ReapplyConfigs(__instance);
         }
 
-        [HarmonyPatch("ConnectClientToPlayerObject")]
+        [HarmonyPatch("SendNewPlayerValuesClientRpc")]
         [HarmonyPostfix]
         private static void ConnectClientToPlayerObject(PlayerControllerB __instance)
         {
-
+            WorldTweaks.MakeTerminalUnusableForAnyoneButHost();
         }
 
         private static void ModifySprintMultiplierValues(ref List<CodeInstruction> instructions)
@@ -214,7 +218,10 @@ namespace MikesTweaks.Scripts.Player
                     continue;
 
                 indexOfMaxSprintMultiplier = i;
-                instructions[i] = CodeInstruction.Call(typeof(ConfigEntrySettings<float>), "get_Value");
+                instructions[i] = CodeInstruction.Call(typeof(ConfigEntrySettings<float>), nameof(ConfigEntrySettings<float>.Value));
+                instructions.Insert(i, CodeInstruction.Call(typeof(ConfigEntrySettings<bool>), nameof(ConfigEntrySettings<bool>.Value)));
+                instructions.Insert(i, new CodeInstruction(OpCodes.Ldc_I4_0));
+                instructions.Insert(i, CodeInstruction.LoadField(typeof(WorldTweaks.Configs), nameof(WorldTweaks.Configs.UseVanillaSprintSpeedValues)));
                 instructions.Insert(i, CodeInstruction.LoadField(typeof(PlayerTweaks.Configs), nameof(PlayerTweaks.Configs.MaxSprintSpeed)));
                 break;
             }
@@ -232,21 +239,30 @@ namespace MikesTweaks.Scripts.Player
 
                     if (!patchedSprintMultiIncrease && Math.Abs((float)instruction.operand - SprintMultiIncreaseValue) < 0.1)
                     {
-                        instructions[i] = CodeInstruction.Call(typeof(ConfigEntrySettings<float>), "get_Value");
+                        instructions[i] = CodeInstruction.Call(typeof(ConfigEntrySettings<float>), nameof(ConfigEntrySettings<float>.Value));
+                        instructions.Insert(i, CodeInstruction.Call(typeof(ConfigEntrySettings<bool>), nameof(ConfigEntrySettings<bool>.Value)));
+                        instructions.Insert(i, new CodeInstruction(OpCodes.Ldc_I4_0));
+                        instructions.Insert(i, CodeInstruction.LoadField(typeof(WorldTweaks.Configs), nameof(WorldTweaks.Configs.UseVanillaSprintSpeedValues)));
                         instructions.Insert(i, CodeInstruction.LoadField(typeof(PlayerTweaks.Configs), nameof(PlayerTweaks.Configs.SprintSpeedIncreasePerFrame)));
                         patchedSprintMultiIncrease = true;
                         continue;
                     }
                     if (!patchedDefaultSprintMultiplier && Math.Abs((float)instruction.operand - DefaultSprintValue) < 0.1)
                     {
-                        instructions[i] = CodeInstruction.Call(typeof(ConfigEntrySettings<float>), "get_Value");
+                        instructions[i] = CodeInstruction.Call(typeof(ConfigEntrySettings<float>), nameof(ConfigEntrySettings<float>.Value));
+                        instructions.Insert(i, CodeInstruction.Call(typeof(ConfigEntrySettings<bool>), nameof(ConfigEntrySettings<bool>.Value)));
+                        instructions.Insert(i, new CodeInstruction(OpCodes.Ldc_I4_0));
+                        instructions.Insert(i, CodeInstruction.LoadField(typeof(WorldTweaks.Configs), nameof(WorldTweaks.Configs.UseVanillaSprintSpeedValues)));
                         instructions.Insert(i, CodeInstruction.LoadField(typeof(PlayerTweaks.Configs), nameof(PlayerTweaks.Configs.DefaultSprintSpeed)));
                         patchedDefaultSprintMultiplier = true;
                         continue;
                     }
                     if (!patchedSprintMultiDecrease && Math.Abs((float)instruction.operand - SprintMultiDecreaseValue) < 0.1)
                     {
-                        instructions[i] = CodeInstruction.Call(typeof(ConfigEntrySettings<float>), "get_Value");
+                        instructions[i] = CodeInstruction.Call(typeof(ConfigEntrySettings<float>), nameof(ConfigEntrySettings<float>.Value));
+                        instructions.Insert(i, CodeInstruction.Call(typeof(ConfigEntrySettings<bool>), nameof(ConfigEntrySettings<bool>.Value)));
+                        instructions.Insert(i, new CodeInstruction(OpCodes.Ldc_I4_0));
+                        instructions.Insert(i, CodeInstruction.LoadField(typeof(WorldTweaks.Configs), nameof(WorldTweaks.Configs.UseVanillaSprintSpeedValues)));
                         instructions.Insert(i, CodeInstruction.LoadField(typeof(PlayerTweaks.Configs), nameof(PlayerTweaks.Configs.SprintSpeedDecreasePerFrame)));
                         patchedSprintMultiDecrease = true;
                         continue;

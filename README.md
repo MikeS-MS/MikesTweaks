@@ -1,19 +1,23 @@
 # MikesTweaks
-Mod for Lethal Company with multiple tweaks to make the game better
+Mod for Lethal Company with multiple configs for tweaks to customize your game's experience. 
 
 # IMPORTANT for people updating from a version before 1.5
  - I've renamed a few configs so it's best to delete the config file you have and let it regenerate by launching the game and change the configs back to your liking.
 
 # Requirements
 - It's a good idea for everyone that will join your lobby to have this mod installed as well and have the same version. Not having the mod and joining someone who does might result in unexpected behaviour and bugs.
-- You will need BepinEx to use this mod, which you can check how to get and install from [here](https://github.com/LethalCompany/LethalCompanyModdingWiki/wiki/Installing-mods) (this message will stay here until BepinEx for Lethal Company has been released on the Thunderstore so I can add it as a dependency and it automatically downloads)
+- You will need BepinEx to use this mod.
 
 # These are the default tweaks that are adjustable from the config file:
 ## Info
   - For more detailed information on the config options check the config file.
   - Config File is located at (GAME_DIRECTORY/BepinEx/configs/mikes.lethalcompany.mikestweaks.cfg)
+  - If you use the "Use Vanilla" game rules as a client you use the vanilla settings for that category regardless of the host's settings.
+  - If you are the host and are using the vanilla "Use Vanilla" game rules, every client will also use vanilla settings for that category.
   - (Synced) means that the configs in that category will be synchronized from the host to every client that joins their lobby.
   - (Individual) means that the configs in that category will not be synchronized from the host to every client that joins their lobby.
+  - (Partial) - Some Configs might not be synced in that category.
+  - (Networked) - Not Synced config but applies using the vanilla networking. Typically means even people without the mod will receive the changes.
 ## 1. Inventory slots (Synced)
   - Slots Amount: 6 (was 4)
 ## 2. Item weights changes (Synced)
@@ -46,8 +50,16 @@ Mod for Lethal Company with multiple tweaks to make the game better
   - Stamina Recharge Weight while standing still: 4 (was 4)
 ## 5. World Settings (Synced)
   - Time Speed: 0.5 (was 1)
-## 6. Game Rules (Synced)
-  - Allow Flashlight Keybind (allows/disallows using the quick-use Flashlight keybind for everyone): true (vanilla: false)
+## 6. Game Rules (Partial)
+  - Allow Flashlight Keybind (allows/disallows using the quick-use Flashlight keybind for everyone): true (vanilla: false) (Synced)
+  - Allow Hotbar Slot Keybinds (allows/disallows using the quick-use hotbar keybinds for everyone): true (vanilla: false) (Synced)
+  - Allow Terminal Use by Clients (allows/disallows using the terminal as a client): true (vanilla: false) (Networked)
+
+  - Use Vanilla Defaults for Sprinting (allows you to use the vanilla settings for sprinting without changing all the individual values tied to sprinting, does not overwrite your values, only ingame values): false (vanilla: true) (Individual)
+
+  - Use Vanilla Defaults for Stamina (allows you to use the vanilla settings for stamina without changing all the individual values tied to stamina, does not overwrite your values, only ingame values): false (vanilla: true) (Individual)
+
+  - Use Vanilla Defaults for Terminal Item Weights (allows you to use the vanilla settings for the weight of terminal items without changing all the individual values tied to them, does not overwrite your values, only ingame values): false (vanilla: true) (Individual)
 
 # Network additions
  - When switching to another slot using the hotkeys it will properly sync which slot/item you're holding to the other people in the lobby.
@@ -58,3 +70,4 @@ Mod for Lethal Company with multiple tweaks to make the game better
  # Known Issues
  - Going past 7 slots (i.e ExtraSlotsAmount = 3 in the config) is generally not a good idea as the slots will go off screen depending on your resolution. Will look into providing better support for this in the future.
  - Be careful not to bind your Push To Talk to your main mouse buttons (left, middle, right) because it might remove the binding from the original actions that happen when those are clicked (like clicking on UI elements for example)
+ - When terminal use for clients is disabled, when you go in and out of the terminal as a host your currently equipped item's model will be hidden until you reselect that item.
