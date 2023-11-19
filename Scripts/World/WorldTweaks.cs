@@ -5,6 +5,7 @@ using System.Text;
 using BepInEx.Configuration;
 using GameNetcodeStuff;
 using HarmonyLib;
+using MikesTweaks.Scripts.Configs;
 using MikesTweaks.Scripts.Inventory;
 using MikesTweaks.Scripts.Networking;
 using Unity.Netcode;

@@ -13,6 +13,7 @@ using Object = UnityEngine.Object;
 using MikesTweaks.Scripts.Networking;
 using MikesTweaks.Scripts.World;
 using Unity.Netcode;
+using MikesTweaks.Scripts.Configs;
 
 namespace MikesTweaks.Scripts.Inventory
 {

@@ -7,6 +7,7 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using GameNetcodeStuff;
 using HarmonyLib;
+using MikesTweaks.Scripts.Configs;
 using MikesTweaks.Scripts.Environment;
 using MikesTweaks.Scripts.Inventory;
 using MikesTweaks.Scripts.Items;
@@ -25,7 +26,7 @@ namespace MikesTweaks.Scripts
     {
         public const string GUID = "mikes.lethalcompany.mikestweaks";
         public const string Name = "Mike's Tweaks";
-        public const string Version = "1.6";
+        public const string Version = "1.6.2";
         public static ManualLogSource Log = null;
         public static MikesTweaks Instance { get; private set; } = null;
 

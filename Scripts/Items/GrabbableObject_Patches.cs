@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using HarmonyLib;
+using MikesTweaks.Scripts.Configs;
 using MikesTweaks.Scripts.Inventory;
 using MikesTweaks.Scripts.World;
 

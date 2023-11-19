@@ -70,4 +70,4 @@ Mod for Lethal Company with multiple configs for tweaks to customize your game's
  # Known Issues
  - Going past 7 slots (i.e ExtraSlotsAmount = 3 in the config) is generally not a good idea as the slots will go off screen depending on your resolution. Will look into providing better support for this in the future.
  - Be careful not to bind your Push To Talk to your main mouse buttons (left, middle, right) because it might remove the binding from the original actions that happen when those are clicked (like clicking on UI elements for example)
- - When terminal use for clients is disabled, when you go in and out of the terminal as a host your currently equipped item's model will be hidden until you reselect that item.
+ - When terminal use for clients is disabled, when you go in and out of the terminal as a host your currently equipped item's model will be hidden for everyone else but you, until you reselect that item.

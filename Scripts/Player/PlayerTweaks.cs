@@ -23,6 +23,7 @@ using MikesTweaks.Scripts.World;
 using Unity.Collections;
 using Unity.Netcode;
 using static UnityEngine.UI.GridLayoutGroup;
+using MikesTweaks.Scripts.Configs;
 
 namespace MikesTweaks.Scripts.Player
 {
@@ -230,7 +231,7 @@ namespace MikesTweaks.Scripts.Player
 
         public static bool IsLocallyControlled(PlayerControllerB player)
         {
-            return player.playerUsername == GameNetworkManager.Instance.username;
+            return player == GameNetworkManager.Instance.localPlayerController;
         }
 
         public static bool CanSwitchSlot(PlayerControllerB player)
