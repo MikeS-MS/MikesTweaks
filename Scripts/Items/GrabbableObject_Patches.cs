@@ -5,6 +5,7 @@ using HarmonyLib;
 using MikesTweaks.Scripts.Configs;
 using MikesTweaks.Scripts.Inventory;
 using MikesTweaks.Scripts.World;
+using Unity.Netcode;
 
 namespace MikesTweaks.Scripts.Items
 {
@@ -15,16 +16,10 @@ namespace MikesTweaks.Scripts.Items
         [HarmonyPostfix]
         public static void ChangeTerminalItemWeights(GrabbableObject __instance)
         {
-            if (__instance == null)
+            if (!NetworkManager.Singleton.IsServer)
                 return;
 
-            int index = Array.FindIndex(InventoryTweaks.Configs.TerminalItemWeights,
-                (ConfigEntrySettings<int> config) => config.ConfigName == __instance.itemProperties.name);
-
-            if (index == -1) return;
-
-            __instance.itemProperties.weight = (((float)InventoryTweaks.Configs.TerminalItemWeights[index].Value(WorldTweaks.Configs.UseVanillaTerminalItemWeights.Value())) / 100f) + 1f;
-
+            InventoryTweaks.ModifyItemWeight(__instance);
         }
     }
 }

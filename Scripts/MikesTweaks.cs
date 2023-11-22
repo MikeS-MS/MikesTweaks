@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using BepInEx;
+using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using GameNetcodeStuff;
@@ -21,14 +24,18 @@ using UnityEngine.UIElements.Internal;
 
 namespace MikesTweaks.Scripts
 {
-    [BepInPlugin(GUID, Name, Version)]
+    [BepInPlugin(GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class MikesTweaks : BaseUnityPlugin
     {
         public const string GUID = "mikes.lethalcompany.mikestweaks";
-        public const string Name = "Mike's Tweaks";
-        public const string Version = "1.6.2";
+
         public static ManualLogSource Log = null;
         public static MikesTweaks Instance { get; private set; } = null;
+
+        public static class Compatibility
+        {
+            public static bool ReservedSlotsCompat = false;
+        }
 
         public void BindConfig<T>(ref ConfigEntrySettings<T> config, string SectionName)
         {
@@ -48,7 +55,7 @@ namespace MikesTweaks.Scripts
             PlayerTweaks.RegisterConfigs(Config);
             InventoryTweaks.RegisterConfigs(Config);
             Config.SaveOnConfigSet = false;
-
+            
             Harmony.CreateAndPatchAll(typeof(MenuManager_Patches));
             Harmony.CreateAndPatchAll(typeof(IngamePlayerSettings_Patches));
             Harmony.CreateAndPatchAll(typeof(HUDManager_Patches));
@@ -60,7 +67,28 @@ namespace MikesTweaks.Scripts
             Harmony.CreateAndPatchAll(typeof(PlayerControllerB_Patches));
             Harmony.CreateAndPatchAll(typeof(GrabbableObject_Patches));
 
+            CheckCompatibilities();
+
             Logger.LogInfo($"Plugin {GUID} is loaded!");
+        }
+
+        private void CheckCompatibilities()
+        {
+            Compatibility.ReservedSlotsCompat = IsModPresent("ReservedItemSlotCore");
+            
+            if (Compatibility.ReservedSlotsCompat)
+                Log.LogInfo("Found: ReservedItemSlotCore");
+        }
+
+        public static bool IsModPresent(string name)
+        {
+            foreach (var pluginInfo in Chainloader.PluginInfos)
+            {
+                if (name == pluginInfo.Value.Metadata.Name)
+                    return true;
+            }
+
+            return false;
         }
     }
 }

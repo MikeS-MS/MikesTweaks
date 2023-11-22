@@ -1,3 +1,11 @@
+# Version 1.6.4
+**Changed**
+ - Fixed items becoming desynced by staying in place for some clients while they were actually in someone else's invetory.
+
+# Version 1.6.3
+**Added**
+ - Compatibility with the ReservedSlot mods which disables extra inventory slots and flashlight toggle, which is automatically enabled if the mod detects that any of the ReservedSlot mods are loaded.
+
 # Version 1.6.2
 **Changed**
  - Fixed keybinds not working under certain conditions (hopefully)

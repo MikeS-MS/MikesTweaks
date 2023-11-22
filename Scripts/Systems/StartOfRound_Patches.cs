@@ -13,7 +13,7 @@ public static class StartOfRound_Patches
     [HarmonyPostfix]
     private static void OnPlayerConnectedClientRpc(StartOfRound __instance, ulong clientId, int assignedPlayerObjectId)
     {
-        PlayerTweaks.LocalPlayerController = __instance.allPlayerScripts[assignedPlayerObjectId];
+        //PlayerTweaks.LocalPlayerController = __instance.allPlayerScripts[assignedPlayerObjectId];
 
         if (NetworkManager.Singleton.IsServer)
             return;

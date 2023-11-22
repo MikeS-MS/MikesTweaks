@@ -93,6 +93,10 @@ namespace MikesTweaks.Scripts.Player
         {
             GameObject playerGameObject = __instance.gameObject;
             playerGameObject.AddComponent<PlayerInputRedirection>();
+
+            if (!NetworkManager.Singleton.IsServer)
+                return;
+
             PlayerTweaks.ReapplyConfigs(__instance);
         }
 

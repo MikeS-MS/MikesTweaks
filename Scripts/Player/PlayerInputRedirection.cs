@@ -142,7 +142,7 @@ namespace MikesTweaks.Scripts.Player
 
         private void ToggleFlashlight()
         {
-            if (!WorldTweaks.Configs.AllowFlashlightKeybind.Value())
+            if (!WorldTweaks.Configs.AllowFlashlightKeybind.Value() || MikesTweaks.Compatibility.ReservedSlotsCompat)
                 return;
 
             bool canUseItem = PlayerTweaks.CanUseItem(owner);

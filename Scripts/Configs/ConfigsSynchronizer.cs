@@ -82,7 +82,7 @@ namespace MikesTweaks.Scripts.Networking
         {
             CustomMessagingManager manager = NetworkManager.Singleton.CustomMessagingManager;
 
-            byte[] versionAsBytes = ToBytes(MikesTweaks.Version);
+            byte[] versionAsBytes = ToBytes(PluginInfo.PLUGIN_VERSION);
             FastBufferWriter writer = new FastBufferWriter(FastBufferWriter.GetWriteSize(versionAsBytes), Allocator.Temp);
 
             using (writer)
@@ -105,7 +105,7 @@ namespace MikesTweaks.Scripts.Networking
 
             payload.ReadValueSafe(out byte[] versionAsBytes);
 
-            if ((string)ToObject(versionAsBytes) != MikesTweaks.Version)
+            if ((string)ToObject(versionAsBytes) != PluginInfo.PLUGIN_VERSION)
             {
                 //StartOfRound.Instance.KickPlayer((int)senderID);
                 return;

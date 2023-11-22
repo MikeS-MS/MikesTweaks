@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using HarmonyLib;
 using MikesTweaks.Scripts.World;
+using Unity.Netcode;
 
 namespace MikesTweaks.Scripts.Systems
 {
@@ -13,6 +14,9 @@ namespace MikesTweaks.Scripts.Systems
         [HarmonyPostfix]
         private static void ChangeTimeSpeedMultiplier(TimeOfDay __instance)
         {
+            if (!NetworkManager.Singleton.IsServer)
+                return;
+
             WorldTweaks.ReapplyConfigs(__instance);
         }
     }

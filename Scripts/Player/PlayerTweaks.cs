@@ -87,7 +87,7 @@ namespace MikesTweaks.Scripts.Player
                 new ConfigEntrySettings<string>("Flashlight", "<Keyboard>/f", "");
         }
 
-        public static PlayerControllerB LocalPlayerController = null;
+        public static PlayerControllerB LocalPlayerController => GameNetworkManager.Instance.localPlayerController;
         public static string PlayerSwitchSlotChannel => "PlayerChangeSlot";
         public static string PlayerSwitchSlotRequestChannel => "PlayerChangeSlotRequest";
 
@@ -109,7 +109,7 @@ namespace MikesTweaks.Scripts.Player
             for (int i = 0; i < Configs.EmoteKeybinds.Length; i++)
                 MikesTweaks.Instance.BindConfig(ref Configs.EmoteKeybinds[i], Configs.KeybindsSectionHeader);
 
-            ConfigsSynchronizer.OnConfigsChangedDelegate += () => ReapplyConfigs(LocalPlayerController, true, true);
+            ConfigsSynchronizer.OnConfigsChangedDelegate += () => ReapplyConfigs(LocalPlayerController, true, true, true);
             ConfigsSynchronizer.Instance.AddConfigGetter(WriteConfigsToWriter);
             ConfigsSynchronizer.Instance.AddConfigSetter(ReadConfigChanges);
             ConfigsSynchronizer.Instance.AddConfigSizeGetter(() => (sizeof(float) * 9));
@@ -162,13 +162,27 @@ namespace MikesTweaks.Scripts.Player
             return payload;
         }
 
-        public static void ReapplyConfigs(PlayerControllerB player, bool force = false, bool updateHud = false)
+        public static void ReapplyConfigs(PlayerControllerB player, bool applyToAllPlayers = false, bool force = false, bool updateHud = false)
         {
             player.sprintTime = Configs.MaxStamina.Value(WorldTweaks.Configs.UseVanillaStaminaValues.Value());
-            InventoryTweaks.ChangeItemSlotsAmount(player, force);
+
+            if (MikesTweaks.Compatibility.ReservedSlotsCompat)
+                return;
+
+            if (!applyToAllPlayers)
+            {
+                InventoryTweaks.ChangeItemSlotsAmount(player, force);
+            }
+            else
+            {
+                foreach (PlayerControllerB playerScript in StartOfRound.Instance.allPlayerScripts)
+                {
+                    InventoryTweaks.ChangeItemSlotsAmount(playerScript, force);
+                }
+            }
 
             if (updateHud)
-                HUDManager_Patches.ChangeItemSlotsAmountUI(HUDManager.Instance);
+                InventoryTweaks.ChangeItemSlotsAmountUI();
         }
 
         public static void RegisterSwitchSlotMessage()

@@ -1,23 +1,39 @@
 # MikesTweaks
 Mod for Lethal Company with multiple configs for tweaks to customize your game's experience. 
 
-# IMPORTANT for people updating from a version before 1.5
- - I've renamed a few configs so it's best to delete the config file you have and let it regenerate by launching the game and change the configs back to your liking.
-
 # Requirements
 - It's a good idea for everyone that will join your lobby to have this mod installed as well and have the same version. Not having the mod and joining someone who does might result in unexpected behaviour and bugs.
 - You will need BepinEx to use this mod.
 
+# Compatibility
+- (Automatically Disabled) - means that regardless of what that config is set to, it will be automatically disabled, until the mod which caused the compatibility mode to start is disabled or removed (needs game restart)
+
+- (Modifiable) - means that it can still be changed and it will take effect
+
+- The mod auto detects and enters compatibility mode if it sees any of the following mods loaded:
+    - Any ReservedSlot mods:
+      - Does not create extra slots from my mod (Automatically Disabled)
+      - Disables flashlight toggle from my mod (Automatically Disabled)
+      - Item Slot keybinds still work, even for the reserved slots (Modifiable)
+
 # These are the default tweaks that are adjustable from the config file:
 ## Info
   - For more detailed information on the config options check the config file.
+
   - Config File is located at (GAME_DIRECTORY/BepinEx/configs/mikes.lethalcompany.mikestweaks.cfg)
+
   - If you use the "Use Vanilla" game rules as a client you use the vanilla settings for that category regardless of the host's settings.
+
   - If you are the host and are using the vanilla "Use Vanilla" game rules, every client will also use vanilla settings for that category.
+
   - (Synced) means that the configs in that category will be synchronized from the host to every client that joins their lobby.
+
   - (Individual) means that the configs in that category will not be synchronized from the host to every client that joins their lobby.
+
   - (Partial) - Some Configs might not be synced in that category.
+
   - (Networked) - Not Synced config but applies using the vanilla networking. Typically means even people without the mod will receive the changes.
+  
 ## 1. Inventory slots (Synced)
   - Slots Amount: 6 (was 4)
 ## 2. Item weights changes (Synced)

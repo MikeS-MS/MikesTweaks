@@ -14,6 +14,7 @@ using MikesTweaks.Scripts.Networking;
 using MikesTweaks.Scripts.World;
 using Unity.Netcode;
 using MikesTweaks.Scripts.Configs;
+using MikesTweaks.Scripts.Player;
 
 namespace MikesTweaks.Scripts.Inventory
 {
@@ -75,7 +76,7 @@ namespace MikesTweaks.Scripts.Inventory
 
         public static bool HasEnoughSlots(int slotID)
         {
-            return ((Configs.ExtraItemSlotsAmount.Value() + 4) - (slotID + 1)) > -1;
+            return ((PlayerTweaks.LocalPlayerController.ItemSlots.Length) - (slotID + 1)) > -1;
         }
 
         public static void ChangeItemSlotsAmount(PlayerControllerB __instance, bool force = false)
@@ -84,7 +85,12 @@ namespace MikesTweaks.Scripts.Inventory
                 if (Configs.ExtraItemSlotsAmount.Value() == 0)
                     return;
 
+            List<GrabbableObject> objects = new List<GrabbableObject>(__instance.ItemSlots);
             __instance.ItemSlots = new GrabbableObject[4 + Configs.ExtraItemSlotsAmount.Value()];
+            for (int i = 0; i < objects.Count; i++) 
+            {
+                __instance.ItemSlots[i] = objects[i];
+            }
         }
 
         public static void ReapplyConfigs()
@@ -93,8 +99,76 @@ namespace MikesTweaks.Scripts.Inventory
 
             foreach (GrabbableObject item in Items)
             {
-                GrabbableObject_Patches.ChangeTerminalItemWeights(item);
+                ModifyItemWeight(item);
             }
+        }
+
+        public static void ModifyItemWeight(GrabbableObject item)
+        {
+            if (item == null)
+                return;
+
+            string itemName = item.itemProperties.name;
+            int index = Array.FindIndex(InventoryTweaks.Configs.TerminalItemWeights,
+                (ConfigEntrySettings<int> config) => config.ConfigName == itemName);
+
+            if (index == -1) return;
+
+            item.itemProperties.weight = (((float)InventoryTweaks.Configs.TerminalItemWeights[index].Value(WorldTweaks.Configs.UseVanillaTerminalItemWeights.Value())) / 100f) + 1f;
+        }
+
+        public static void ChangeItemSlotsAmountUI()
+        {
+            if (Configs.ExtraItemSlotsAmount.Value() == 0)
+                return;
+
+            GameObject Inventory = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/Inventory");
+            List<string> SlotNamesToIgnore = new List<string>() { "Slot0", "Slot1", "Slot2", "Slot3" };
+            for (int i = 0; i < Inventory.transform.childCount; i++)
+            {
+                Transform child = Inventory.transform.GetChild(i);
+                if (SlotNamesToIgnore.Contains(child.gameObject.name))
+                    continue;
+
+                Object.Destroy(child.gameObject);
+            }
+
+            // Prepare the arrays
+            Image[] ItemSlotIconFrames = new Image[4 + InventoryTweaks.Configs.ExtraItemSlotsAmount.Value()];
+            ItemSlotIconFrames[0] = HUDManager.Instance.itemSlotIconFrames[0];
+            ItemSlotIconFrames[1] = HUDManager.Instance.itemSlotIconFrames[1];
+            ItemSlotIconFrames[2] = HUDManager.Instance.itemSlotIconFrames[2];
+            ItemSlotIconFrames[3] = HUDManager.Instance.itemSlotIconFrames[3];
+
+            Image[] ItemSlotIcons = new Image[4 + InventoryTweaks.Configs.ExtraItemSlotsAmount.Value()];
+            ItemSlotIcons[0] = HUDManager.Instance.itemSlotIcons[0];
+            ItemSlotIcons[1] = HUDManager.Instance.itemSlotIcons[1];
+            ItemSlotIcons[2] = HUDManager.Instance.itemSlotIcons[2];
+            ItemSlotIcons[3] = HUDManager.Instance.itemSlotIcons[3];
+
+            GameObject Slot4 = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/Inventory/Slot3");
+            GameObject CurrentSlot = Slot4;
+
+            // Spawn more UI slots.
+            for (int i = 0; i < InventoryTweaks.Configs.ExtraItemSlotsAmount.Value(); i++)
+            {
+                GameObject NewSlot = Object.Instantiate(Slot4);
+                NewSlot.name = $"Slot{3 + (i + 1)}";
+                NewSlot.transform.parent = Inventory.transform;
+
+                // Change locations.
+                Vector3 localPosition = CurrentSlot.transform.localPosition;
+                NewSlot.transform.SetLocalPositionAndRotation(
+                                                            new Vector3(localPosition.x + 50, localPosition.y, localPosition.z),
+                                                            CurrentSlot.transform.localRotation);
+                CurrentSlot = NewSlot;
+
+                ItemSlotIconFrames[3 + (i + 1)] = NewSlot.GetComponent<Image>();
+                ItemSlotIcons[3 + (i + 1)] = NewSlot.transform.GetChild(0).GetComponent<Image>(); ;
+            }
+
+            HUDManager.Instance.itemSlotIconFrames = ItemSlotIconFrames;
+            HUDManager.Instance.itemSlotIcons = ItemSlotIcons;
         }
     }
 }
