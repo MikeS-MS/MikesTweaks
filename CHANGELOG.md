@@ -1,3 +1,7 @@
+# Version 1.6.5
+**Changed**
+ - Fixed a description typo, no need to update to this if you have 1.6.4
+
 # Version 1.6.4
 **Changed**
  - Fixed items becoming desynced by staying in place for some clients while they were actually in someone else's invetory.
