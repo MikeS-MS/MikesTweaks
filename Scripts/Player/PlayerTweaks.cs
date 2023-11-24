@@ -85,13 +85,16 @@ namespace MikesTweaks.Scripts.Player
 
             public static ConfigEntrySettings<string> FlashlightKeybind =
                 new ConfigEntrySettings<string>("Flashlight", "<Keyboard>/f", "");
+
+            public static ConfigEntrySettings<string> WalkieTalkieKeybind =
+                new ConfigEntrySettings<string>("WalkieTalkieKeybind", "<Keyboard>/r", "");
         }
 
         public static PlayerControllerB LocalPlayerController => GameNetworkManager.Instance.localPlayerController;
         public static string PlayerSwitchSlotChannel => "PlayerChangeSlot";
         public static string PlayerSwitchSlotRequestChannel => "PlayerChangeSlotRequest";
 
-        public static void RegisterConfigs(ConfigFile config)
+        public static void RegisterConfigs()
         {
             MikesTweaks.Instance.BindConfig(ref Configs.MaxStamina, Configs.PlayerTweaksSectionHeader);
             MikesTweaks.Instance.BindConfig(ref Configs.DefaultSprintSpeed, Configs.PlayerTweaksSectionHeader);
@@ -104,6 +107,7 @@ namespace MikesTweaks.Scripts.Player
             MikesTweaks.Instance.BindConfig(ref Configs.JumpStaminaDrain, Configs.PlayerTweaksSectionHeader);
             
             MikesTweaks.Instance.BindConfig(ref Configs.FlashlightKeybind, Configs.KeybindsSectionHeader);
+            MikesTweaks.Instance.BindConfig(ref Configs.WalkieTalkieKeybind, Configs.KeybindsSectionHeader);
             for (int i = 0; i < Configs.SlotKeybinds.Length; i++)
                 MikesTweaks.Instance.BindConfig(ref Configs.SlotKeybinds[i], Configs.KeybindsSectionHeader);
             for (int i = 0; i < Configs.EmoteKeybinds.Length; i++)

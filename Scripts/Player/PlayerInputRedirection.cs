@@ -18,6 +18,7 @@ namespace MikesTweaks.Scripts.Player
         private PlayerControllerB owner = null;
         private MikesTweaksPlayerInput input = null;
         private MethodInfo SwitchToSlotMethod = null;
+        private WalkieTalkie WalkieTalkieToStop = null;
 
         public void OnHotbar1(InputAction.CallbackContext context)
         {
@@ -126,8 +127,19 @@ namespace MikesTweaks.Scripts.Player
 
         public void OnWalkieTalkieSpeak(InputAction.CallbackContext context)
         {
-            if (context.phase != InputActionPhase.Performed)
-                return;
+            switch (context.phase)
+            {
+                case InputActionPhase.Performed:
+                {
+                    UseWalkieTalkie();
+                    break;
+                }
+                case InputActionPhase.Canceled:
+                {
+                    StopUsingWalkieTalkie();
+                    break;
+                }
+            }
         }
 
         public void OnEnable()
@@ -155,6 +167,11 @@ namespace MikesTweaks.Scripts.Player
             if ((float)timeSinceSwitchingSlots.GetValue(owner) < 0.075f)
                 return;
 
+            /* TODO: 
+             * Prioritize Pro flashlights over normal flashlights
+             * Ignore laser pointers
+             * Prioritize flashlights with batteries
+             */
             foreach (GrabbableObject item in owner.ItemSlots)
             {
                 FlashlightItem flashlight = item as FlashlightItem;
@@ -169,6 +186,40 @@ namespace MikesTweaks.Scripts.Player
                     flashlight.PocketItem();
                 return;
             }
+        }
+
+        private void UseWalkieTalkie()
+        {
+            if (!WorldTweaks.Configs.AllowWalkieTalkieKeybind.Value() || MikesTweaks.Compatibility.ReservedSlotsCompat)
+                return;
+
+            bool canUseItem = PlayerTweaks.CanUseItem(owner);
+            if (!canUseItem)
+                return;
+
+            FieldInfo timeSinceSwitchingSlots = typeof(PlayerControllerB)
+                .GetField("timeSinceSwitchingSlots", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            if ((float)timeSinceSwitchingSlots.GetValue(owner) < 0.075f)
+                return;
+
+            // TODO: Prioritize WalkieTalkies with batteries
+            foreach (GrabbableObject item in owner.ItemSlots)
+            {
+                WalkieTalkieToStop = item as WalkieTalkie;
+
+                if (WalkieTalkieToStop == null)
+                    continue;
+
+                WalkieTalkieToStop.UseItemOnClient();
+                timeSinceSwitchingSlots.SetValue(owner, 0f);
+                return;
+            }
+        }
+
+        private void StopUsingWalkieTalkie()
+        {
+            WalkieTalkieToStop?.UseItemOnClient(false);
         }
 
         public void Destroy()
@@ -213,6 +264,7 @@ namespace MikesTweaks.Scripts.Player
             input.Emotes.Emote2.ChangeBinding(0).WithPath(PlayerTweaks.Configs.EmoteKeybinds[1].Value());
 
             input.Actions.FlashlightToggle.ChangeBinding(0).WithPath(PlayerTweaks.Configs.FlashlightKeybind.Value());
+            input.Actions.WalkieTalkieSpeak.ChangeBinding(0).WithPath(PlayerTweaks.Configs.WalkieTalkieKeybind.Value());
         }
 
         private void Awake()

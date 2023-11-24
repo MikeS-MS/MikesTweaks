@@ -300,7 +300,7 @@ namespace MikesTweaks.Scripts.Input
                 {
                     ""name"": """",
                     ""id"": ""2b96c07a-e84a-45e2-a17a-d4a9b8aa14a7"",
-                    ""path"": ""<Keyboard>/h"",
+                    ""path"": ""<Keyboard>/r"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

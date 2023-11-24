@@ -30,8 +30,12 @@ namespace MikesTweaks.Scripts.World
                 new ConfigEntrySettings<bool>("AllowFlashlightKeybind", true, false,
                     "Set this to false if you don't want people who join your lobby to be able to use the flashlight keybind and to true if you want them to be able to.");
 
+            public static ConfigEntrySettings<bool> AllowWalkieTalkieKeybind =
+                new ConfigEntrySettings<bool>("AllowWalkieTalkieKeybind", true, false,
+                    "Set this to false if you don't want people who join your lobby to be able to use the flashlight keybind and to true if you want them to be able to.");
+
             public static ConfigEntrySettings<bool> AllowClientsToUseTerminal =
-                new ConfigEntrySettings<bool>("AllowClientsToUseTerminal", false, true,
+                new ConfigEntrySettings<bool>("AllowClientsToUseTerminal", true, true,
                     "Set this to false if you don't want people who join your lobby to be able to use the terminal and to true if you want them to be able to.\nYou probably want to set this to true if you're hosting a lobby with people you know and trust.");
 
             public static ConfigEntrySettings<bool> UseVanillaSprintSpeedValues =
@@ -45,34 +49,42 @@ namespace MikesTweaks.Scripts.World
             public static ConfigEntrySettings<bool> UseVanillaTerminalItemWeights =
                 new ConfigEntrySettings<bool>("UseVanillaTerminalItemWeights", false, true,
                     "Set this to true if you want to use all the vanilla values for the weight of every terminal item.");
+
+            public static ConfigEntrySettings<bool> UseVanillaMoonCosts =
+                new ConfigEntrySettings<bool>("UseVanillaMoonCosts", false, true,
+                    "Set this to true if you want to use all the vanilla values for the cost of traveling to the moons.");
         }
 
-        public static Terminal terminalInstance = null;
+        public static Terminal TerminalInstance = null;
         public static InteractTrigger TerminalInteractTriggerInstance = null;
-        private static MethodInfo terminalTriggerInUseRPC = typeof(InteractTrigger)
+        private static readonly MethodInfo TerminalTriggerInUseRPC = typeof(InteractTrigger)
             .GetMethod("UpdateUsedByPlayerServerRpc", BindingFlags.NonPublic | BindingFlags.Instance);
 
-        public static void RegisterConfigs(ConfigFile config)
+        public static void RegisterConfigs()
         {
             MikesTweaks.Instance.BindConfig(ref Configs.GlobalTimeSpeedMulti, Configs.GameRulesSectionHeader);
             MikesTweaks.Instance.BindConfig(ref Configs.AllowHotbarKeybinds, Configs.GameRulesSectionHeader);
             MikesTweaks.Instance.BindConfig(ref Configs.AllowFlashlightKeybind, Configs.GameRulesSectionHeader);
+            MikesTweaks.Instance.BindConfig(ref Configs.AllowWalkieTalkieKeybind, Configs.GameRulesSectionHeader);
             MikesTweaks.Instance.BindConfig(ref Configs.AllowClientsToUseTerminal, Configs.GameRulesSectionHeader);
             MikesTweaks.Instance.BindConfig(ref Configs.UseVanillaSprintSpeedValues, Configs.GameRulesSectionHeader);
             MikesTweaks.Instance.BindConfig(ref Configs.UseVanillaStaminaValues, Configs.GameRulesSectionHeader);
             MikesTweaks.Instance.BindConfig(ref Configs.UseVanillaTerminalItemWeights, Configs.GameRulesSectionHeader);
+            MikesTweaks.Instance.BindConfig(ref Configs.UseVanillaMoonCosts, Configs.GameRulesSectionHeader);
 
             ConfigsSynchronizer.OnConfigsChangedDelegate += () => ReapplyConfigs(TimeOfDay.Instance);
             ConfigsSynchronizer.Instance.AddConfigGetter(WriteConfigsToWriter);
             ConfigsSynchronizer.Instance.AddConfigSetter(ReadConfigChanges);
-            ConfigsSynchronizer.Instance.AddConfigSizeGetter(() => sizeof(float) + (2 * sizeof(bool)));
+            ConfigsSynchronizer.Instance.AddConfigSizeGetter(() => sizeof(float) + (sizeof(bool) * 4));
         }
 
         public static FastBufferWriter WriteConfigsToWriter(FastBufferWriter writer)
         {
             writer.WriteValueSafe(Configs.GlobalTimeSpeedMulti.Value());
             writer.WriteValueSafe(Configs.AllowFlashlightKeybind.Value());
+            writer.WriteValueSafe(Configs.AllowWalkieTalkieKeybind.Value());
             writer.WriteValueSafe(Configs.AllowHotbarKeybinds.Value());
+            writer.WriteValueSafe(Configs.UseVanillaMoonCosts.Value());
 
             return writer;
         }
@@ -86,7 +98,13 @@ namespace MikesTweaks.Scripts.World
             Configs.AllowFlashlightKeybind.Entry.Value = BoolValue;
 
             payload.ReadValue(out BoolValue);
+            Configs.AllowWalkieTalkieKeybind.Entry.Value = BoolValue;
+
+            payload.ReadValue(out BoolValue);
             Configs.AllowHotbarKeybinds.Entry.Value = BoolValue;
+
+            payload.ReadValue(out BoolValue);
+            Configs.UseVanillaMoonCosts.Entry.Value = BoolValue;
 
             return payload;
         }
@@ -117,7 +135,7 @@ namespace MikesTweaks.Scripts.World
                 return;
 
             object[] args = { 0 };
-            terminalTriggerInUseRPC.Invoke(TerminalInteractTriggerInstance, args);
+            TerminalTriggerInUseRPC.Invoke(TerminalInteractTriggerInstance, args);
         }
 
         public static void ResetValues(InteractTrigger trigger)

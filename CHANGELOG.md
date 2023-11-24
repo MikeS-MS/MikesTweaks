@@ -1,3 +1,13 @@
+# Version 1.8
+**Added**
+ - A way to change the cost of traveling to every moon, even ones added by mods if they implemented them the vanilla way.
+ - A Game Rule that uses the vanilla values for the cost of traveling to moons.
+
+# Version 1.7
+**Added**
+ - A configurable keybind to use walkie talkies (if present in inventory, will pick the first one left to right)
+ - A Game Rule to allow the usage of the walkie talkie keybind
+ 
 # Version 1.6.5
 **Changed**
  - Fixed a description typo, no need to update to this if you have 1.6.4

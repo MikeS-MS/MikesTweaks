@@ -19,7 +19,7 @@ namespace MikesTweaks.Scripts.Environment
             if (terminal == null)
                 return;
 
-            WorldTweaks.terminalInstance = terminal;
+            WorldTweaks.TerminalInstance = terminal;
             WorldTweaks.TerminalInteractTriggerInstance = __instance;
         }
 

@@ -14,6 +14,7 @@ using MikesTweaks.Scripts.Configs;
 using MikesTweaks.Scripts.Environment;
 using MikesTweaks.Scripts.Inventory;
 using MikesTweaks.Scripts.Items;
+using MikesTweaks.Scripts.Moons;
 using MikesTweaks.Scripts.Player;
 using MikesTweaks.Scripts.Systems;
 using MikesTweaks.Scripts.World;
@@ -51,9 +52,10 @@ namespace MikesTweaks.Scripts
         {
             Instance = this;
             Log = Logger;
-            WorldTweaks.RegisterConfigs(Config);
-            PlayerTweaks.RegisterConfigs(Config);
-            InventoryTweaks.RegisterConfigs(Config);
+            WorldTweaks.RegisterConfigs();
+            MoonTweaks.RegisterConfigs();
+            PlayerTweaks.RegisterConfigs();
+            InventoryTweaks.RegisterConfigs();
             Config.SaveOnConfigSet = false;
             
             Harmony.CreateAndPatchAll(typeof(MenuManager_Patches));

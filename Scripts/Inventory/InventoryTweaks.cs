@@ -46,7 +46,7 @@ namespace MikesTweaks.Scripts.Inventory
                 };
         }
 
-        public static void RegisterConfigs(ConfigFile config)
+        public static void RegisterConfigs()
         {
             MikesTweaks.Instance.BindConfig(ref Configs.ExtraItemSlotsAmount, Configs.InventoryTweaksSectionHeader);
 
