@@ -29,7 +29,7 @@ namespace MikesTweaks.Scripts.Moons
                 {"Titan", 700}
             };
 
-            public static ConfigEntrySettings<string> MoonPrices = new ConfigEntrySettings<string>("MoonPrices", JsonConvert.SerializeObject(DefaultMoonCosts), JsonConvert.SerializeObject(DefaultMoonCosts), "To change the cost to go to a planet you can change the amount corresponding to the moon you want to modify.\nYou can also modify the cost of moons from different mods here, by just adding another entry anywhere in the dictionary with the planet's name and the cost you want it to be\nThe value is a json string which is why you see \\ everywhere before \".\nTo add another moon, just add , after Titan's value and write it like so \\\"MoonName\":Value");
+            public static ConfigEntrySettings<string> MoonPrices = new ConfigEntrySettings<string>("MoonPrices", JsonConvert.SerializeObject(DefaultMoonCosts), JsonConvert.SerializeObject(DefaultMoonCosts), "To change the cost to go to a planet you can change the amount corresponding to the moon you want to modify.\nYou can also modify the cost of moons from different mods here, by just adding another entry anywhere in the dictionary with the planet's name and the cost you want it to be\nThe value is a json string which is why you see \\ everywhere before \".\nTo add another moon, just add , after Titan's value and write it like so \\\"MoonName\\\":Value");
 
             public static Dictionary<string, int> MoonPricesDeserialized;
 
@@ -111,20 +111,8 @@ namespace MikesTweaks.Scripts.Moons
             if (!vanilla)
                 return;
 
-            Dictionary<string, int> DefaultMoonCosts = new Dictionary<string, int>(Configs.DefaultMoonCosts);
-
-            foreach (var moon in MoonCosts.Keys)
-            {
-                foreach (var defaultMoon in DefaultMoonCosts.Keys)
-                {
-                    if (moon != defaultMoon)
-                        continue;
-
-                    MoonCosts[moon] = DefaultMoonCosts[defaultMoon];
-                    DefaultMoonCosts.Remove(defaultMoon);
-                    break;
-                }
-            }
+            foreach (var defaultMoon in Configs.DefaultMoonCosts)
+                MoonCosts[defaultMoon.Key] = defaultMoon.Value;
         }
 
         private static void ReadMoonPrices()

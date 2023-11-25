@@ -1,3 +1,7 @@
+# Version 1.8.1
+**Changed**
+ - Fixed a bug when `UseVanillaMoonCosts` was set to `true`
+
 # Version 1.8
 **Added**
  - A way to change the cost of traveling to every moon, even ones added by mods if they implemented them the vanilla way.
