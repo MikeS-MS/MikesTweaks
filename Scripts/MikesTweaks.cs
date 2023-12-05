@@ -15,6 +15,7 @@ using MikesTweaks.Scripts.Environment;
 using MikesTweaks.Scripts.Inventory;
 using MikesTweaks.Scripts.Items;
 using MikesTweaks.Scripts.Moons;
+using MikesTweaks.Scripts.Networking;
 using MikesTweaks.Scripts.Player;
 using MikesTweaks.Scripts.Systems;
 using MikesTweaks.Scripts.World;
@@ -46,6 +47,7 @@ namespace MikesTweaks.Scripts
         public void LoadConfigs()
         {
             Config.Reload();
+            ConfigsSynchronizer.ConfigsReceived = false;
         }
 
         private void Awake()

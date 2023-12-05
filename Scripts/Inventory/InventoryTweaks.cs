@@ -56,21 +56,29 @@ namespace MikesTweaks.Scripts.Inventory
             ConfigsSynchronizer.OnConfigsChangedDelegate += ReapplyConfigs;
             ConfigsSynchronizer.Instance.AddConfigGetter(WriteConfigsToWriter);
             ConfigsSynchronizer.Instance.AddConfigSetter(ReadConfigChanges);
-            ConfigsSynchronizer.Instance.AddConfigSizeGetter(() => sizeof(int));
+            ConfigsSynchronizer.Instance.AddConfigSizeGetter(() => sizeof(int) + sizeof(int) * Configs.TerminalItemWeights.Length);
         }
 
         public static FastBufferWriter WriteConfigsToWriter(FastBufferWriter writer)
         {
             writer.WriteValueSafe(Configs.ExtraItemSlotsAmount.Value());
-
+            foreach (var item in Configs.TerminalItemWeights)
+            {
+                writer.WriteValueSafe(item.Value(WorldTweaks.Configs.UseVanillaTerminalItemWeights.Value()));
+            }
             return writer;
         }
 
         public static FastBufferReader ReadConfigChanges(FastBufferReader payload)
         {
-            payload.ReadValue(out int Value);
+            payload.ReadValueSafe(out int Value);
             Configs.ExtraItemSlotsAmount.Entry.Value = Value;
 
+            foreach (var item in Configs.TerminalItemWeights)
+            {
+                payload.ReadValueSafe(out Value);
+                item.Entry.Value = Value;
+            }
             return payload;
         }
 

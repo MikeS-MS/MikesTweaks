@@ -33,7 +33,7 @@ namespace MikesTweaks.Scripts.Moons
 
             public static Dictionary<string, int> MoonPricesDeserialized;
 
-            public static int MoonPricesSize => FastBufferWriter.GetWriteSize(ConfigsSynchronizer.ToBytes(MoonPrices.Value()));
+            public static int MoonPricesSize => FastBufferWriter.GetWriteSize(ConfigsSynchronizer.ToBytes(JsonConvert.SerializeObject(MoonPricesDeserialized)));
         }
 
         public static void RegisterConfigs()

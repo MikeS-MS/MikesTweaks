@@ -4,6 +4,7 @@ using System.Text;
 using HarmonyLib;
 using MikesTweaks.Scripts.Configs;
 using MikesTweaks.Scripts.Inventory;
+using MikesTweaks.Scripts.Networking;
 using MikesTweaks.Scripts.World;
 using Unity.Netcode;
 
@@ -16,7 +17,7 @@ namespace MikesTweaks.Scripts.Items
         [HarmonyPostfix]
         public static void ChangeTerminalItemWeights(GrabbableObject __instance)
         {
-            if (!NetworkManager.Singleton.IsServer)
+            if (!NetworkManager.Singleton.IsServer && !ConfigsSynchronizer.ConfigsReceived)
                 return;
 
             InventoryTweaks.ModifyItemWeight(__instance);

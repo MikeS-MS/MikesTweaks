@@ -1,3 +1,8 @@
+# Version 1.8.2
+**Changed**
+ - Fixed a bug where Terminal Item Weights would not be synced to the clients
+ - Fixed a bug where when syncing configs it wouldn't sync any due to buffer size issues.
+
 # Version 1.8.1
 **Changed**
  - Fixed a bug when `UseVanillaMoonCosts` was set to `true`

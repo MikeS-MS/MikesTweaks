@@ -14,6 +14,7 @@ namespace MikesTweaks.Scripts.Networking
 {
     public class ConfigsSynchronizer
     {
+        public static bool ConfigsReceived = false;
         public static Action OnConfigsChangedDelegate;
 
         public static ConfigsSynchronizer Instance
@@ -124,6 +125,7 @@ namespace MikesTweaks.Scripts.Networking
                 payload = setter.Invoke(payload);
             }
 
+            ConfigsReceived = true;
             OnConfigsChangedDelegate?.Invoke();
         }
 
