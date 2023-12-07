@@ -1,3 +1,6 @@
+# Version 1.8.3
+ - Fixed incorrect vanilla value for your max stamina when using `UseVanillaStaminaValues`, it was 5 before this update, but the actual vanilla default value is 11
+
 # Version 1.8.2
 **Changed**
  - Fixed a bug where Terminal Item Weights would not be synced to the clients

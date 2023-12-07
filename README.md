@@ -57,7 +57,7 @@ Mod for Lethal Company with multiple configs for tweaks to customize your game's
   - Flashlight Keybind: F
   - WalkieTalkie Keybind: R
 ## 4. Player Sprint (Synced)
-  - Sprint Stamina: 12 (was 5)
+  - Sprint Stamina: 15 (was 11)
   - Stamina Drain from jump: 0.04 (was 0.08)
   - Default Sprint Speed value: 1.5 (was 1)
   - Max Sprint Speed Value: 3 (was 2.25)

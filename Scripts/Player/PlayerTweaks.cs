@@ -35,7 +35,7 @@ namespace MikesTweaks.Scripts.Player
             public static string PlayerTweaksSectionHeader => "PlayerTweaks";
 
             public static ConfigEntrySettings<float> MaxStamina =
-                new ConfigEntrySettings<float>("MaxStamina", 12, 5, "This is the maximum amount of time you can run.\nThe higher the number, the longer you can run for.");
+                new ConfigEntrySettings<float>("MaxStamina", 15f, 11f, "This is the maximum amount of time you can run.\nThe higher the number, the longer you can run for.");
 
             public static ConfigEntrySettings<float> DefaultSprintSpeed =
                 new ConfigEntrySettings<float>("DefaultSprintSpeed", 1.5f, 1f, "This is the floor of your sprint speed.\nEvery frame your sprint speed decreases when you don't run and this is as low as it can go.");
