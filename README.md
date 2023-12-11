@@ -1,6 +1,12 @@
 # MikesTweaks
 Mod for Lethal Company with multiple configs for tweaks to customize your game's experience. 
 
+# Important! 
+**If you're updating from before 1.9, backup your changed values in the config file, delete the config file, run the game again after updating to regenerate it and change the configs again to what they were before.**
+
+**This is due to changes to some of the config values' names.**
+# Target Game Version: v45
+
 # Requirements
 - It's a good idea for everyone that will join your lobby to have this mod installed as well and have the same version. Not having the mod and joining someone who does, might result in unexpected behaviour and bugs.
 - You will need BepinEx to use this mod.
