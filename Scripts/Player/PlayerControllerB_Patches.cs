@@ -21,15 +21,12 @@ namespace MikesTweaks.Scripts.Player
     {
         private static PlayerInputRedirection inputRedirection = null;
 
-        public static void SetupKeybinds(PlayerControllerB __instance)
+        public static void SetupKeybinds(PlayerControllerB player)
         {
-            __instance.playerActions.Movement.Emote1.Disable();
-            __instance.playerActions.Movement.Emote2.Disable();
-
-            if (!PlayerTweaks.IsLocallyControlled(__instance))
+            if (!PlayerTweaks.IsLocallyControlled(player))
                 return;
 
-            inputRedirection = __instance.gameObject.GetComponent<PlayerInputRedirection>();
+            inputRedirection = player.gameObject.GetComponent<PlayerInputRedirection>();
             inputRedirection.InitializeKeybinds();
         }
 
@@ -256,6 +253,20 @@ namespace MikesTweaks.Scripts.Player
             }
 
             return instructions.AsEnumerable();
+        }
+
+        [HarmonyPatch("Emote1_performed")]
+        [HarmonyPrefix]
+        private static bool Emote1_performed()
+        {
+            return false;
+        }
+
+        [HarmonyPatch("Emote2_performed")]
+        [HarmonyPrefix]
+        private static bool Emote2_performed()
+        {
+            return false;
         }
 
         [HarmonyPatch("SendNewPlayerValuesClientRpc")]

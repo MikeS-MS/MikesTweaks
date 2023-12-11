@@ -168,6 +168,8 @@ namespace MikesTweaks.Scripts.Player
 
         public static void ReapplyConfigs(PlayerControllerB player, bool applyToAllPlayers = false, bool force = false, bool updateHud = false)
         {
+            float VanillaSprintTime = player.sprintTime;
+            int VanillaInventorySlots = player.ItemSlots.Length;
             player.sprintTime = Configs.MaxStamina.Value(WorldTweaks.Configs.UseVanillaStaminaValues.Value());
 
             if (MikesTweaks.Compatibility.ReservedSlotsCompat)
@@ -187,6 +189,13 @@ namespace MikesTweaks.Scripts.Player
 
             if (updateHud)
                 InventoryTweaks.ChangeItemSlotsAmountUI();
+
+
+            if (!MikesTweaks.DebugMode)
+                return;
+
+            MikesTweaks.Log.LogInfo($"InventorySlots: {VanillaInventorySlots}");
+            MikesTweaks.Log.LogInfo($"MaxStamina: {VanillaSprintTime}");
         }
 
         public static void RegisterSwitchSlotMessage()

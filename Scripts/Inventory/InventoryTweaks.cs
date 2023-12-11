@@ -26,23 +26,42 @@ namespace MikesTweaks.Scripts.Inventory
 
             public static ConfigEntrySettings<int> ExtraItemSlotsAmount = new ConfigEntrySettings<int>("ExtraItemSlots", 2, 0, "This increases how many slots you have.\n0 Slots means you have the default 4 from the vanilla game, if you increase this number you get additional slots in addition to the original 4.");
 
-            public static string TerminalItemWeightsSectionHeader => "TerminalItemWeights";
+            public static string TerminalItemProperties => "TerminalItemProperties";
 
-            public static ConfigEntrySettings<int>[] TerminalItemWeights =
+            public static ConfigEntrySettings<int>[] ToolItemWeights =
                 new ConfigEntrySettings<int>[]
                 {
-                    new ConfigEntrySettings<int>("WalkieTalkie", 0, 0),
-                    new ConfigEntrySettings<int>("Flashlight", 0, 0),
-                    new ConfigEntrySettings<int>("Shovel", 5, 18),
-                    new ConfigEntrySettings<int>("LockPicker", 2, 15),
-                    new ConfigEntrySettings<int>("ProFlashlight", 0, 5),
-                    new ConfigEntrySettings<int>("StunGrenade", 2, 5),
-                    new ConfigEntrySettings<int>("Boombox", 5, 15),
-                    new ConfigEntrySettings<int>("TZPInhalant", 0, 0),
-                    new ConfigEntrySettings<int>("ZapGun", 4, 10),
-                    new ConfigEntrySettings<int>("Jetpack", 10, 50),
-                    new ConfigEntrySettings<int>("ExtensionLadder", 0, 0),
-                    new ConfigEntrySettings<int>("RadarBooster", 5, 18)
+                    new ConfigEntrySettings<int>("WalkieTalkieWeight", 0, 0),
+                    new ConfigEntrySettings<int>("FlashlightWeight", 0, 0),
+                    new ConfigEntrySettings<int>("ShovelWeight", 5, 18),
+                    new ConfigEntrySettings<int>("LockPickerWeight", 2, 15),
+                    new ConfigEntrySettings<int>("ProFlashlightWeight", 0, 5),
+                    new ConfigEntrySettings<int>("StunGrenadeWeight", 2, 5),
+                    new ConfigEntrySettings<int>("BoomboxWeight", 5, 15),
+                    new ConfigEntrySettings<int>("TZPInhalantWeight", 0, 0),
+                    new ConfigEntrySettings<int>("ZapGunWeight", 4, 10),
+                    new ConfigEntrySettings<int>("JetpackWeight", 10, 50),
+                    new ConfigEntrySettings<int>("ExtensionLadderWeight", 0, 0),
+                    new ConfigEntrySettings<int>("RadarBoosterWeight", 5, 18),
+                    new ConfigEntrySettings<int>("SprayPaintWeight", 1, 1)
+                };
+
+            public static ConfigEntrySettings<int>[] ToolItemPrices =
+                new ConfigEntrySettings<int>[]
+                {
+                    new ConfigEntrySettings<int>("WalkieTalkiePrice", 12, 12),
+                    new ConfigEntrySettings<int>("FlashlightPrice", 15, 15),
+                    new ConfigEntrySettings<int>("ShovelPrice", 30, 30),
+                    new ConfigEntrySettings<int>("LockPickerPrice", 20, 20),
+                    new ConfigEntrySettings<int>("ProFlashlightPrice", 25, 25),
+                    new ConfigEntrySettings<int>("StunGrenadePrice", 30, 30),
+                    new ConfigEntrySettings<int>("BoomboxPrice", 60, 60),
+                    new ConfigEntrySettings<int>("TZPInhalantPrice", 120, 120),
+                    new ConfigEntrySettings<int>("ZapGunPrice", 400, 400),
+                    new ConfigEntrySettings<int>("JetpackPrice", 700, 700),
+                    new ConfigEntrySettings<int>("ExtensionLadderPrice", 60, 60),
+                    new ConfigEntrySettings<int>("RadarBoosterPrice", 60, 60),
+                    new ConfigEntrySettings<int>("SprayPaintPrice", 50, 50)
                 };
         }
 
@@ -50,21 +69,32 @@ namespace MikesTweaks.Scripts.Inventory
         {
             MikesTweaks.Instance.BindConfig(ref Configs.ExtraItemSlotsAmount, Configs.InventoryTweaksSectionHeader);
 
-            for (int i = 0; i < Configs.TerminalItemWeights.Length; i++)
-                MikesTweaks.Instance.BindConfig(ref Configs.TerminalItemWeights[i], Configs.TerminalItemWeightsSectionHeader);
+            for (int i = 0; i < Configs.ToolItemWeights.Length; i++)
+            {
+                MikesTweaks.Instance.BindConfig(ref Configs.ToolItemWeights[i], Configs.TerminalItemProperties);
+                MikesTweaks.Instance.BindConfig(ref Configs.ToolItemPrices[i], Configs.TerminalItemProperties);
+            }
 
-            ConfigsSynchronizer.OnConfigsChangedDelegate += ReapplyConfigs;
+            ConfigsSynchronizer.OnConfigsChangedDelegate += () =>
+            {
+                ReapplyConfigs();
+                ApplyItemPrices(WorldTweaks.TerminalInstance);
+            };
             ConfigsSynchronizer.Instance.AddConfigGetter(WriteConfigsToWriter);
             ConfigsSynchronizer.Instance.AddConfigSetter(ReadConfigChanges);
-            ConfigsSynchronizer.Instance.AddConfigSizeGetter(() => sizeof(int) + sizeof(int) * Configs.TerminalItemWeights.Length);
+            ConfigsSynchronizer.Instance.AddConfigSizeGetter(() => sizeof(int) + sizeof(int) * Configs.ToolItemWeights.Length + sizeof(int) * Configs.ToolItemPrices.Length);
         }
 
         public static FastBufferWriter WriteConfigsToWriter(FastBufferWriter writer)
         {
             writer.WriteValueSafe(Configs.ExtraItemSlotsAmount.Value());
-            foreach (var item in Configs.TerminalItemWeights)
+            foreach (var item in Configs.ToolItemWeights)
             {
-                writer.WriteValueSafe(item.Value(WorldTweaks.Configs.UseVanillaTerminalItemWeights.Value()));
+                writer.WriteValueSafe(item.Value(WorldTweaks.Configs.UseVanillaToolItemWeights.Value()));
+            }
+            foreach (var item in Configs.ToolItemPrices)
+            {
+                writer.WriteValueSafe(item.Value(WorldTweaks.Configs.UseVanillaToolItemPrices.Value()));
             }
             return writer;
         }
@@ -74,7 +104,13 @@ namespace MikesTweaks.Scripts.Inventory
             payload.ReadValueSafe(out int Value);
             Configs.ExtraItemSlotsAmount.Entry.Value = Value;
 
-            foreach (var item in Configs.TerminalItemWeights)
+            foreach (var item in Configs.ToolItemWeights)
+            {
+                payload.ReadValueSafe(out Value);
+                item.Entry.Value = Value;
+            }
+
+            foreach (var item in Configs.ToolItemPrices)
             {
                 payload.ReadValueSafe(out Value);
                 item.Entry.Value = Value;
@@ -103,11 +139,47 @@ namespace MikesTweaks.Scripts.Inventory
 
         public static void ReapplyConfigs()
         {
-            GrabbableObject[] Items = GameObject.FindObjectsByType<GrabbableObject>(FindObjectsSortMode.None);
+            GrabbableObject[] Items = Resources.FindObjectsOfTypeAll<GrabbableObject>();
 
             foreach (GrabbableObject item in Items)
             {
                 ModifyItemWeight(item);
+            }
+
+            ApplyItemPrices(WorldTweaks.TerminalInstance);
+        }
+
+        public static void ApplyItemPrices(Terminal terminal)
+        {
+            if (!terminal)
+                return;
+
+            TerminalKeyword Buy = Array.Find(terminal.terminalNodes.allKeywords, (TerminalKeyword keyword) => keyword.name == "Buy");
+
+            if (Buy == null)
+                return;
+
+            bool useVanillaPrices = WorldTweaks.Configs.UseVanillaToolItemPrices.Value();
+
+            foreach (var buyItem in Buy.compatibleNouns)
+            {
+                foreach (var item in Configs.ToolItemPrices)
+                {
+                    if (!item.ConfigName.Contains(buyItem.noun.name))
+                        continue;
+
+                    buyItem.result.itemCost = item.Value(useVanillaPrices);
+                    terminal.buyableItemsList[buyItem.result.buyItemIndex].creditsWorth = item.Value(useVanillaPrices);
+                    foreach (var confirmAction in buyItem.result.terminalOptions)
+                    {
+                        if (confirmAction.noun.name.ToLower().Contains("deny"))
+                            continue;
+
+                        confirmAction.result.itemCost = item.Value(useVanillaPrices);
+                        break;
+                    }
+                    break;
+                }
             }
         }
 
@@ -117,12 +189,12 @@ namespace MikesTweaks.Scripts.Inventory
                 return;
 
             string itemName = item.itemProperties.name;
-            int index = Array.FindIndex(InventoryTweaks.Configs.TerminalItemWeights,
-                (ConfigEntrySettings<int> config) => config.ConfigName == itemName);
+            int index = Array.FindIndex(InventoryTweaks.Configs.ToolItemWeights,
+                (ConfigEntrySettings<int> config) => config.ConfigName.Contains(itemName));
 
             if (index == -1) return;
 
-            item.itemProperties.weight = (((float)InventoryTweaks.Configs.TerminalItemWeights[index].Value(WorldTweaks.Configs.UseVanillaTerminalItemWeights.Value())) / 100f) + 1f;
+            item.itemProperties.weight = (((float)InventoryTweaks.Configs.ToolItemWeights[index].Value(WorldTweaks.Configs.UseVanillaToolItemWeights.Value())) / 100f) + 1f;
         }
 
         public static void ChangeItemSlotsAmountUI()

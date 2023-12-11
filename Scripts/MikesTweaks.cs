@@ -30,6 +30,7 @@ namespace MikesTweaks.Scripts
     public class MikesTweaks : BaseUnityPlugin
     {
         public const string GUID = "mikes.lethalcompany.mikestweaks";
+        public const bool DebugMode = false;
 
         public static ManualLogSource Log = null;
         public static MikesTweaks Instance { get; private set; } = null;

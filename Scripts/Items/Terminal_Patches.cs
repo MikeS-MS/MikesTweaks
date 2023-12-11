@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using HarmonyLib;
+using MikesTweaks.Scripts.Inventory;
 using MikesTweaks.Scripts.Moons;
 using MikesTweaks.Scripts.World;
 using Unity.Netcode;
@@ -19,6 +20,7 @@ namespace MikesTweaks.Scripts.Items
                 return;
 
             MoonTweaks.ReapplyConfigs(__instance);
+            InventoryTweaks.ApplyItemPrices(__instance);
         }
     }
 }

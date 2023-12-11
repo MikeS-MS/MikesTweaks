@@ -1,4 +1,14 @@
+# Version 1.9
+## Important! Backup your changed values in the config file, delete the config file, run the game again to regenerate it and change the configs again to what they were before.
+**Added**
+ - A way to change the price for all items that can be picked up in your inventory.
+ - A Game rule that sets it so that all prices are vanilla and not what you set them as.
+
+**Changed**
+ - Fixed a bug where emotes are still bound to 1 and 2 as well as whatever is set in the config file, introduced in Lethal Company v45
+
 # Version 1.8.3
+**Changed**
  - Fixed incorrect vanilla value for your max stamina when using `UseVanillaStaminaValues`, it was 5 before this update, but the actual vanilla default value is 11
 
 # Version 1.8.2

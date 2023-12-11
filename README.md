@@ -27,7 +27,7 @@ Mod for Lethal Company with multiple configs for tweaks to customize your game's
 
   - If you are the host and are using the vanilla "Use Vanilla" game rules, every client will also use vanilla settings for that category.
 
-  - (Synced) means that the configs in that category will be synchronized from the host to every client that joins their lobby.
+  - (Synced) means that the configs in that category will be synchronized from the host to every client that joins their lobby which has the same version of the mod.
 
   - (Individual) means that the configs in that category will not be synchronized from the host to every client that joins their lobby.
 
@@ -37,7 +37,7 @@ Mod for Lethal Company with multiple configs for tweaks to customize your game's
   
 ## 1. Inventory slots (Synced)
   - Slots Amount: 6 (was 4)
-## 2. Item weights changes (Synced)
+## 2. Tool Item weights changes (Synced)
   - WalkieTalkie: 0 lb (was 0 lb)
   - Flashlight: 0 lb (was 0 lb)
   - Shovel: 5 lb (was 18 lb)
@@ -50,6 +50,20 @@ Mod for Lethal Company with multiple configs for tweaks to customize your game's
   - Jetpack: 10 lb (was 50 lb)
   - ExtensionLadder: 0 lb (was 0 lb)
   - Radar Booster: 5 lb (was 18 lb)
+## 3. Tool Item Prices (Synced)
+  - WalkieTalkiePrice: 12 (was 12)
+  - FlashlightPrice: 15 (was 15)
+  - ShovelPrice: 30 (was 30)
+  - LockPickerPrice: 20 (was 20)
+  - ProFlashlightPrice: 25 (was 25)
+  - StunGrenadePrice: 30 (was 30)
+  - BoomboxPrice: 60 (was 60)
+  - TZPInhalantPrice: 120 (was 120)
+  - ZapGunPrice: 400 (was 400)
+  - JetpackPrice: 700 (was 700)
+  - ExtensionLadderPrice: 60 (was 60)
+  - RadarBoosterPrice: 60 (was 60)
+  - SprayPaintPrice: 50 (was 50)
 ## 3. Player Keybinds (Individual)
   - Hotbar slots: 1-9 keyboard keys
   - Emotes: Y and U keys
@@ -85,7 +99,9 @@ Mod for Lethal Company with multiple configs for tweaks to customize your game's
 
   - Use Vanilla Defaults for Stamina (allows you to use the vanilla settings for stamina without changing all the individual values tied to stamina, does not overwrite your values, only ingame values): false (vanilla: true) (Individual)
 
-  - Use Vanilla Defaults for Terminal Item Weights (allows you to use the vanilla settings for the weight of terminal items without changing all the individual values tied to them, does not overwrite your values, only ingame values): false (vanilla: true) (Individual)
+  - Use Vanilla Defaults for Tool Item Weights (allows you to use the vanilla settings for the weight of tool items without changing all the individual values tied to them, does not overwrite your values, only ingame values): false (vanilla: true) (Individual)
+
+  - Use Vanilla Defaults for Tool Item Prices (allows you to use the vanilla settings for the prices of tool items without changing all the individual values tied to them, does not overwrite your values, only ingame values): false (vanilla: true) (Synced)
 
 # Network additions
  - When switching to another slot using the hotkeys it will properly sync which slot/item you're holding to the other people in the lobby.

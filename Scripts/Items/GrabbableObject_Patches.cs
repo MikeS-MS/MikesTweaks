@@ -17,6 +17,9 @@ namespace MikesTweaks.Scripts.Items
         [HarmonyPostfix]
         public static void ChangeTerminalItemWeights(GrabbableObject __instance)
         {
+            if (MikesTweaks.DebugMode)
+                MikesTweaks.Log.LogInfo($"{__instance.itemProperties.name}: {__instance.itemProperties.weight}");
+
             if (!NetworkManager.Singleton.IsServer && !ConfigsSynchronizer.ConfigsReceived)
                 return;
 

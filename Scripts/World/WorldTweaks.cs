@@ -46,7 +46,11 @@ namespace MikesTweaks.Scripts.World
                 new ConfigEntrySettings<bool>("UseVanillaStaminaValues", false, true,
                     "Set this to true if you want to use all the vanilla values tied to stamina.\nSprint speed related configs not included.");
 
-            public static ConfigEntrySettings<bool> UseVanillaTerminalItemWeights =
+            public static ConfigEntrySettings<bool> UseVanillaToolItemWeights =
+                new ConfigEntrySettings<bool>("UseVanillaTerminalItemWeights", false, true,
+                    "Set this to true if you want to use all the vanilla values for the weight of every terminal item.");
+
+            public static ConfigEntrySettings<bool> UseVanillaToolItemPrices =
                 new ConfigEntrySettings<bool>("UseVanillaTerminalItemWeights", false, true,
                     "Set this to true if you want to use all the vanilla values for the weight of every terminal item.");
 
@@ -69,13 +73,14 @@ namespace MikesTweaks.Scripts.World
             MikesTweaks.Instance.BindConfig(ref Configs.AllowClientsToUseTerminal, Configs.GameRulesSectionHeader);
             MikesTweaks.Instance.BindConfig(ref Configs.UseVanillaSprintSpeedValues, Configs.GameRulesSectionHeader);
             MikesTweaks.Instance.BindConfig(ref Configs.UseVanillaStaminaValues, Configs.GameRulesSectionHeader);
-            MikesTweaks.Instance.BindConfig(ref Configs.UseVanillaTerminalItemWeights, Configs.GameRulesSectionHeader);
+            MikesTweaks.Instance.BindConfig(ref Configs.UseVanillaToolItemWeights, Configs.GameRulesSectionHeader);
+            MikesTweaks.Instance.BindConfig(ref Configs.UseVanillaToolItemPrices, Configs.GameRulesSectionHeader);
             MikesTweaks.Instance.BindConfig(ref Configs.UseVanillaMoonCosts, Configs.GameRulesSectionHeader);
 
             ConfigsSynchronizer.OnConfigsChangedDelegate += () => ReapplyConfigs(TimeOfDay.Instance);
             ConfigsSynchronizer.Instance.AddConfigGetter(WriteConfigsToWriter);
             ConfigsSynchronizer.Instance.AddConfigSetter(ReadConfigChanges);
-            ConfigsSynchronizer.Instance.AddConfigSizeGetter(() => sizeof(float) + (sizeof(bool) * 4));
+            ConfigsSynchronizer.Instance.AddConfigSizeGetter(() => sizeof(float) + (sizeof(bool) * 5));
         }
 
         public static FastBufferWriter WriteConfigsToWriter(FastBufferWriter writer)
@@ -84,6 +89,7 @@ namespace MikesTweaks.Scripts.World
             writer.WriteValueSafe(Configs.AllowFlashlightKeybind.Value());
             writer.WriteValueSafe(Configs.AllowWalkieTalkieKeybind.Value());
             writer.WriteValueSafe(Configs.AllowHotbarKeybinds.Value());
+            writer.WriteValueSafe(Configs.UseVanillaToolItemPrices.Value());
             writer.WriteValueSafe(Configs.UseVanillaMoonCosts.Value());
 
             return writer;
@@ -102,6 +108,9 @@ namespace MikesTweaks.Scripts.World
 
             payload.ReadValue(out BoolValue);
             Configs.AllowHotbarKeybinds.Entry.Value = BoolValue;
+
+            payload.ReadValue(out BoolValue);
+            Configs.UseVanillaToolItemPrices.Entry.Value = BoolValue;
 
             payload.ReadValue(out BoolValue);
             Configs.UseVanillaMoonCosts.Entry.Value = BoolValue;
