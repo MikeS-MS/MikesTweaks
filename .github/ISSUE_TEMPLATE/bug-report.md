@@ -1,7 +1,7 @@
 ---
 name: Bug Report
 about: Bug Report template
-title: "**[BUG]**"
+title: "[BUG] "
 labels: possible bug
 assignees: MikeS-MS
 
