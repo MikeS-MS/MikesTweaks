@@ -15,6 +15,7 @@ using MikesTweaks.Scripts.World;
 using Unity.Netcode;
 using MikesTweaks.Scripts.Configs;
 using MikesTweaks.Scripts.Player;
+using MikesTweaks.Scripts.Utilities;
 
 namespace MikesTweaks.Scripts.Inventory
 {
@@ -154,7 +155,7 @@ namespace MikesTweaks.Scripts.Inventory
             if (!terminal)
                 return;
 
-            TerminalKeyword Buy = Array.Find(terminal.terminalNodes.allKeywords, (TerminalKeyword keyword) => keyword.name == "Buy");
+            TerminalKeyword Buy = Array.Find(terminal.terminalNodes.allKeywords, (TerminalKeyword keyword) => keyword.name.ToLower() == "buy");
 
             if (Buy == null)
                 return;
@@ -165,7 +166,9 @@ namespace MikesTweaks.Scripts.Inventory
             {
                 foreach (var item in Configs.ToolItemPrices)
                 {
-                    if (!item.ConfigName.Contains(buyItem.noun.name))
+                    string buyItemName = buyItem.noun.name.ToLower();
+                    StringUtils.RemoveChar(ref buyItemName, ' ');
+                    if (!item.ConfigName.ToLower().Contains(buyItemName))
                         continue;
 
                     buyItem.result.itemCost = item.Value(useVanillaPrices);
@@ -188,9 +191,10 @@ namespace MikesTweaks.Scripts.Inventory
             if (item == null)
                 return;
 
-            string itemName = item.itemProperties.name;
+            string itemName = item.itemProperties.name.ToLower();
+            StringUtils.RemoveChar(ref itemName, ' ');
             int index = Array.FindIndex(InventoryTweaks.Configs.ToolItemWeights,
-                (ConfigEntrySettings<int> config) => config.ConfigName.Contains(itemName));
+                (ConfigEntrySettings<int> config) => config.ConfigName.ToLower().Contains(itemName));
 
             if (index == -1) return;
 

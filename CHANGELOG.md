@@ -1,3 +1,14 @@
+# Version 1.9.2
+**Changed**
+ - Fixed wrong vanilla value for `GlobalTimeSpeedMultiplier`, was 1, now it's 1.4 which is the correct vanilla value.
+ - Fixed missing README entry for the new item that was introduced in v45.
+
+# Version 1.9.1
+## Important! Backup your changed values in the config file, delete the config file, run the game again to regenerate it and change the configs again to what they were before.
+**Changed**
+ - Fixed incorrect internal names causing prices to not apply to given items.
+ - Fixed the `UseVanillaToolPriceValues` not appearing in configs.
+
 # Version 1.9
 ## Important! Backup your changed values in the config file, delete the config file, run the game again to regenerate it and change the configs again to what they were before.
 **Added**

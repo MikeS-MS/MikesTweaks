@@ -204,7 +204,7 @@ namespace MikesTweaks.Scripts.Player
             NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(PlayerSwitchSlotRequestChannel, ReceiveSwitchSlotRequest);
         }
 
-        public static void SwitchSlot_Server(int slot, ulong clientIDOfChagedSlot)
+        public static void SwitchSlot_Server(int slot, ulong clientIDOfChangedSlot)
         {
             if (!NetworkManager.Singleton.IsServer)
                 return;
@@ -213,7 +213,7 @@ namespace MikesTweaks.Scripts.Player
             CustomMessagingManager manager = NetworkManager.Singleton.CustomMessagingManager;
             FastBufferWriter writer = new FastBufferWriter(sizeof(int) + sizeof(ulong), Allocator.Temp);
             writer.WriteValueSafe(slot);
-            writer.WriteValueSafe(clientIDOfChagedSlot);
+            writer.WriteValueSafe(clientIDOfChangedSlot);
             manager.SendNamedMessageToAll(PlayerSwitchSlotChannel, writer, NetworkDelivery.Reliable);
         }
 

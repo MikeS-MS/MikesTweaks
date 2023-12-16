@@ -142,6 +142,7 @@ namespace MikesTweaks.Scripts.Player
             }
         }
 
+
         public void OnEnable()
         {
             input?.Enable();
@@ -279,11 +280,11 @@ namespace MikesTweaks.Scripts.Player
                 return;
 
             SwitchToSlot(slot);
+            typeof(PlayerControllerB).GetField("timeSinceSwitchingSlots", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(owner, 0f);
             CustomMessagingManager manager = NetworkManager.Singleton.CustomMessagingManager;
             FastBufferWriter writer = new FastBufferWriter(sizeof(int), Allocator.Temp);
             writer.WriteValueSafe(slot);
             manager.SendNamedMessage(PlayerTweaks.PlayerSwitchSlotRequestChannel, 0, writer, NetworkDelivery.Reliable);
-            typeof(PlayerControllerB).GetField("timeSinceSwitchingSlots", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(owner, 0f);
         }
 
         public void SwitchToSlot(int slot)

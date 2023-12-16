@@ -20,7 +20,7 @@ namespace MikesTweaks.Scripts.World
 
 
             public static ConfigEntrySettings<float> GlobalTimeSpeedMulti =
-                new ConfigEntrySettings<float>("GlobalTimeSpeedMultiplier", 0.5f, 1f, "Think of this as a percentage, the lower it is, the slower the time goes by, the higher it is, the faster time passes.");
+                new ConfigEntrySettings<float>("GlobalTimeSpeedMultiplier", 0.7f, 1.4f, "Think of this as a percentage, the lower it is, the slower the time goes by, the higher it is, the faster time passes.");
 
             public static ConfigEntrySettings<bool> AllowHotbarKeybinds =
                 new ConfigEntrySettings<bool>("AllowHotbarKeybinds", true, false,
@@ -47,12 +47,12 @@ namespace MikesTweaks.Scripts.World
                     "Set this to true if you want to use all the vanilla values tied to stamina.\nSprint speed related configs not included.");
 
             public static ConfigEntrySettings<bool> UseVanillaToolItemWeights =
-                new ConfigEntrySettings<bool>("UseVanillaTerminalItemWeights", false, true,
-                    "Set this to true if you want to use all the vanilla values for the weight of every terminal item.");
+                new ConfigEntrySettings<bool>("UseVanillaToolItemWeights", false, true,
+                    "Set this to true if you want to use all the vanilla values for the weight of every tool item.");
 
             public static ConfigEntrySettings<bool> UseVanillaToolItemPrices =
-                new ConfigEntrySettings<bool>("UseVanillaTerminalItemWeights", false, true,
-                    "Set this to true if you want to use all the vanilla values for the weight of every terminal item.");
+                new ConfigEntrySettings<bool>("UseVanillaToolItemPrices", false, true,
+                    "Set this to true if you want to use all the vanilla values for the price of every tool item.");
 
             public static ConfigEntrySettings<bool> UseVanillaMoonCosts =
                 new ConfigEntrySettings<bool>("UseVanillaMoonCosts", false, true,
