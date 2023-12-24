@@ -75,8 +75,8 @@ namespace MikesTweaks.Scripts.Networking
         public void RegisterMessages()
         {
             //NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(SyncChannelName, ReceiveConfigs);
-            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(RequestChannelName, ReceiveRequestConfigs);
+            CustomNetworking.Instance.RegisterChannel(SyncChannelName, ReceiveConfigs);
+            CustomNetworking.Instance.RegisterChannel(RequestChannelName, ReceiveRequestConfigs);
         }
 
         public void RequestConfigs()

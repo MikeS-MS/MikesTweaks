@@ -37,7 +37,10 @@ namespace MikesTweaks.Scripts
 
         public static class Compatibility
         {
-            public static bool ReservedSlotsCompat = false;
+            public static bool ReservedSlotCoreCompat = false;
+            public static bool ReservedSlotsWalkieCompat = false;
+            public static bool ReservedSlotsFlashlightCompat = false;
+            public static bool LethalThingsCompat = false;
         }
 
         public void BindConfig<T>(ref ConfigEntrySettings<T> config, string SectionName)
@@ -62,7 +65,7 @@ namespace MikesTweaks.Scripts
             Config.SaveOnConfigSet = false;
             
             Harmony.CreateAndPatchAll(typeof(MenuManager_Patches));
-            Harmony.CreateAndPatchAll(typeof(IngamePlayerSettings_Patches));
+            //Harmony.CreateAndPatchAll(typeof(IngamePlayerSettings_Patches));
             Harmony.CreateAndPatchAll(typeof(HUDManager_Patches));
             Harmony.CreateAndPatchAll(typeof(NetworkManager_Patches));
             Harmony.CreateAndPatchAll(typeof(StartOfRound_Patches));
@@ -79,17 +82,32 @@ namespace MikesTweaks.Scripts
 
         private void CheckCompatibilities()
         {
-            Compatibility.ReservedSlotsCompat = IsModPresent("ReservedItemSlotCore");
-            
-            if (Compatibility.ReservedSlotsCompat)
+            Compatibility.ReservedSlotCoreCompat = IsModPresent("FlipMods.ReservedItemSlotCore");
+
+            if (Compatibility.ReservedSlotCoreCompat)
                 Log.LogInfo("Found: ReservedItemSlotCore");
+
+            Compatibility.ReservedSlotsWalkieCompat = IsModPresent("FlipMods.ReservedWalkieSlot");
+            
+            if (Compatibility.ReservedSlotsWalkieCompat)
+                Log.LogInfo("Found: ReservedWalkieSlot");
+
+            Compatibility.ReservedSlotsFlashlightCompat = IsModPresent("FlipMods.ReservedFlashlightSlot");
+
+            if (Compatibility.ReservedSlotsFlashlightCompat)
+                Log.LogInfo("Found: ReservedFlashlightSlot");
+
+            Compatibility.LethalThingsCompat = IsModPresent("evaisa.lethalthings");
+
+            if (Compatibility.LethalThingsCompat)
+                Log.LogInfo("Found: LethalThings");
         }
 
         public static bool IsModPresent(string name)
         {
             foreach (var pluginInfo in Chainloader.PluginInfos)
             {
-                if (name == pluginInfo.Value.Metadata.Name)
+                if (name == pluginInfo.Value.Metadata.GUID)
                     return true;
             }
 

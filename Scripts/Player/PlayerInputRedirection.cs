@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using MikesTweaks.Scripts.Networking;
 using MikesTweaks.Scripts.World;
 using Unity.Collections;
 using Unity.Netcode;
@@ -19,6 +20,7 @@ namespace MikesTweaks.Scripts.Player
         private MikesTweaksPlayerInput input = null;
         private MethodInfo SwitchToSlotMethod = null;
         private WalkieTalkie WalkieTalkieToStop = null;
+        private FlashlightItem FlashlightToStop = null;
 
         public void OnHotbar1(InputAction.CallbackContext context)
         {
@@ -142,7 +144,6 @@ namespace MikesTweaks.Scripts.Player
             }
         }
 
-
         public void OnEnable()
         {
             input?.Enable();
@@ -151,76 +152,6 @@ namespace MikesTweaks.Scripts.Player
         public void OnDisable()
         {
             input?.Disable();
-        }
-
-        private void ToggleFlashlight()
-        {
-            if (!WorldTweaks.Configs.AllowFlashlightKeybind.Value() || MikesTweaks.Compatibility.ReservedSlotsCompat)
-                return;
-
-            bool canUseItem = PlayerTweaks.CanUseItem(owner);
-            if (!canUseItem)
-                return;
-
-            FieldInfo timeSinceSwitchingSlots = typeof(PlayerControllerB)
-                .GetField("timeSinceSwitchingSlots", BindingFlags.NonPublic | BindingFlags.Instance);
-
-            if ((float)timeSinceSwitchingSlots.GetValue(owner) < 0.075f)
-                return;
-
-            /* TODO: 
-             * Prioritize Pro flashlights over normal flashlights
-             * Ignore laser pointers
-             * Prioritize flashlights with batteries
-             */
-            foreach (GrabbableObject item in owner.ItemSlots)
-            {
-                FlashlightItem flashlight = item as FlashlightItem;
-
-                if (flashlight == null)
-                    continue;
-
-                bool pocketed = flashlight.isPocketed;
-                flashlight.UseItemOnClient();
-                timeSinceSwitchingSlots.SetValue(owner, 0f);
-                if (pocketed)
-                    flashlight.PocketItem();
-                return;
-            }
-        }
-
-        private void UseWalkieTalkie()
-        {
-            if (!WorldTweaks.Configs.AllowWalkieTalkieKeybind.Value() || MikesTweaks.Compatibility.ReservedSlotsCompat)
-                return;
-
-            bool canUseItem = PlayerTweaks.CanUseItem(owner);
-            if (!canUseItem)
-                return;
-
-            FieldInfo timeSinceSwitchingSlots = typeof(PlayerControllerB)
-                .GetField("timeSinceSwitchingSlots", BindingFlags.NonPublic | BindingFlags.Instance);
-
-            if ((float)timeSinceSwitchingSlots.GetValue(owner) < 0.075f)
-                return;
-
-            // TODO: Prioritize WalkieTalkies with batteries
-            foreach (GrabbableObject item in owner.ItemSlots)
-            {
-                WalkieTalkieToStop = item as WalkieTalkie;
-
-                if (WalkieTalkieToStop == null)
-                    continue;
-
-                WalkieTalkieToStop.UseItemOnClient();
-                timeSinceSwitchingSlots.SetValue(owner, 0f);
-                return;
-            }
-        }
-
-        private void StopUsingWalkieTalkie()
-        {
-            WalkieTalkieToStop?.UseItemOnClient(false);
         }
 
         public void Destroy()
@@ -266,6 +197,192 @@ namespace MikesTweaks.Scripts.Player
 
             input.Actions.FlashlightToggle.ChangeBinding(0).WithPath(PlayerTweaks.Configs.FlashlightKeybind.Value());
             input.Actions.WalkieTalkieSpeak.ChangeBinding(0).WithPath(PlayerTweaks.Configs.WalkieTalkieKeybind.Value());
+        }
+
+        private void FindBestFlashlight(ref FlashlightItem BestFlashlight, ref List<FlashlightItem> Flashlights)
+        {
+            foreach (FlashlightItem flashlight in Flashlights)
+            {
+                if (BestFlashlight == null)
+                {
+                    BestFlashlight = flashlight;
+                    continue;
+                }
+
+                if (flashlight.insertedBattery.charge > BestFlashlight.insertedBattery.charge && flashlight.insertedBattery.charge > 0f)
+                    BestFlashlight = flashlight;
+            }
+        }
+
+        private void UseSelectedFlashlight(ref FlashlightItem Flashlight, ref FieldInfo timeSinceSwitchingSlots)
+        {
+            bool pocketed = Flashlight.isPocketed;
+            Flashlight.playerHeldBy.ChangeHelmetLight(Flashlight.flashlightTypeID);
+            Flashlight.UseItemOnClient();
+            timeSinceSwitchingSlots.SetValue(owner, 0f);
+            FlashlightToStop = Flashlight;
+            if (!pocketed)
+                return;
+
+            Flashlight.PocketItem();
+        }
+
+        private void ToggleFlashlight()
+        {
+            if (!NetworkManager.Singleton.IsServer && !ConfigsSynchronizer.ConfigsReceived)
+                return;
+
+            if (!WorldTweaks.Configs.AllowFlashlightKeybind.Value() || MikesTweaks.Compatibility.ReservedSlotsFlashlightCompat)
+                return;
+
+            bool canUseItem = PlayerTweaks.CanUseItem(owner);
+            if (!canUseItem)
+                return;
+
+            FieldInfo timeSinceSwitchingSlots = typeof(PlayerControllerB)
+                .GetField("timeSinceSwitchingSlots", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            if ((float)timeSinceSwitchingSlots.GetValue(owner) < 0.075f)
+                return;
+
+            if (FlashlightToStop)
+            {
+                if (FlashlightToStop.playerHeldBy == owner)
+                {
+                    if (FlashlightToStop.flashlightTypeID == 0 && FlashlightToStop.insertedBattery.charge > 0)
+                    {
+                        UseSelectedFlashlight(ref FlashlightToStop, ref timeSinceSwitchingSlots);
+                        return;
+                    }
+                }
+            }
+
+            /* TODO: 
+             * Prioritize Pro flashlights over normal flashlights
+             * Ignore laser pointers
+             * Prioritize flashlights with batteries
+             */
+            FlashlightItem BestFlashlight = null;
+            List<FlashlightItem> ProFlashlights = new List<FlashlightItem>();
+            List<FlashlightItem> NormalFlashlights = new List<FlashlightItem>();
+
+            foreach (GrabbableObject item in owner.ItemSlots)
+            {
+                BestFlashlight = item as FlashlightItem;
+
+                if (BestFlashlight == null)
+                    continue;
+
+                switch (BestFlashlight.flashlightTypeID)
+                {
+                    case 0:
+                    {
+                        ProFlashlights.Add(BestFlashlight);
+                        break;
+                    }
+                    case 1:
+                    {
+                        NormalFlashlights.Add(BestFlashlight);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+
+            BestFlashlight = null;
+            FindBestFlashlight(ref BestFlashlight, ref ProFlashlights);
+
+            if (BestFlashlight != null)
+            {
+                UseSelectedFlashlight(ref BestFlashlight, ref timeSinceSwitchingSlots);
+                return;
+            }
+
+            if (FlashlightToStop)
+            {
+                if (FlashlightToStop.playerHeldBy == owner)
+                {
+                    if (FlashlightToStop.flashlightTypeID == 1 && FlashlightToStop.insertedBattery.charge > 0)
+                    {
+                        UseSelectedFlashlight(ref FlashlightToStop, ref timeSinceSwitchingSlots);
+                        return;
+                    }
+                }
+            }
+
+            FindBestFlashlight(ref BestFlashlight, ref NormalFlashlights);
+
+            if (BestFlashlight != null)
+            {
+                UseSelectedFlashlight(ref BestFlashlight, ref timeSinceSwitchingSlots);
+                return;
+            }
+        }
+
+        private void UseWalkieTalkie()
+        {
+            if (!NetworkManager.Singleton.IsServer && !ConfigsSynchronizer.ConfigsReceived)
+                return;
+
+            if (!WorldTweaks.Configs.AllowWalkieTalkieKeybind.Value() || MikesTweaks.Compatibility.ReservedSlotsWalkieCompat)
+                return;
+
+            bool canUseItem = PlayerTweaks.CanUseItem(owner);
+            if (!canUseItem)
+                return;
+
+            FieldInfo timeSinceSwitchingSlots = typeof(PlayerControllerB)
+                .GetField("timeSinceSwitchingSlots", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            if ((float)timeSinceSwitchingSlots.GetValue(owner) < 0.075f)
+                return;
+
+            // TODO: Prioritize WalkieTalkies with batteries
+            WalkieTalkie BestWalkieTalkie = null;
+            List<WalkieTalkie> WalkieTalkieList = new List<WalkieTalkie>();
+            foreach (GrabbableObject item in owner.ItemSlots)
+            {
+                BestWalkieTalkie = item as WalkieTalkie;
+
+                if (BestWalkieTalkie == null)
+                    continue;
+                WalkieTalkieList.Add(BestWalkieTalkie);
+                return;
+            }
+
+            BestWalkieTalkie = null;
+            foreach (WalkieTalkie walkie in WalkieTalkieList)
+            {
+                if (BestWalkieTalkie == null)
+                {
+                    BestWalkieTalkie = walkie;
+                    continue;
+                }
+
+                if (!walkie.isBeingUsed)
+                    continue;
+
+                if (walkie.insertedBattery.charge <= BestWalkieTalkie.insertedBattery.charge)
+                    continue;
+
+                BestWalkieTalkie = walkie;
+            }
+
+            if (BestWalkieTalkie == null)
+                return;
+
+            BestWalkieTalkie.UseItemOnClient();
+            timeSinceSwitchingSlots.SetValue(owner, 0f);
+            WalkieTalkieToStop = BestWalkieTalkie;
+        }
+
+        private void StopUsingWalkieTalkie()
+        {
+            if (!WalkieTalkieToStop) return;
+            if (WalkieTalkieToStop.playerHeldBy != owner) return;
+
+            WalkieTalkieToStop.UseItemOnClient(false);
         }
 
         private void Awake()

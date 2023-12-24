@@ -172,7 +172,7 @@ namespace MikesTweaks.Scripts.Player
             int VanillaInventorySlots = player.ItemSlots.Length;
             player.sprintTime = Configs.MaxStamina.Value(WorldTweaks.Configs.UseVanillaStaminaValues.Value());
 
-            if (MikesTweaks.Compatibility.ReservedSlotsCompat)
+            if (MikesTweaks.Compatibility.ReservedSlotCoreCompat || MikesTweaks.Compatibility.LethalThingsCompat)
                 return;
 
             if (!applyToAllPlayers)
@@ -200,8 +200,8 @@ namespace MikesTweaks.Scripts.Player
 
         public static void RegisterSwitchSlotMessage()
         {
-            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(PlayerSwitchSlotChannel, ReceiveSwitchSlot);
-            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(PlayerSwitchSlotRequestChannel, ReceiveSwitchSlotRequest);
+            CustomNetworking.Instance.RegisterChannel(PlayerSwitchSlotChannel, ReceiveSwitchSlot);
+            CustomNetworking.Instance.RegisterChannel(PlayerSwitchSlotRequestChannel, ReceiveSwitchSlotRequest);
         }
 
         public static void SwitchSlot_Server(int slot, ulong clientIDOfChangedSlot)
@@ -232,7 +232,7 @@ namespace MikesTweaks.Scripts.Player
 
             foreach (PlayerControllerB playerController in StartOfRound.Instance.allPlayerScripts)
             {
-                if (playerController.playerClientId != clientID)
+                if (playerController.actualClientId != clientID)
                     continue;
 
                 playerController.gameObject.GetComponent<PlayerInputRedirection>().SwitchToSlot(slot);

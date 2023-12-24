@@ -8,7 +8,7 @@ Mod for Lethal Company with multiple configs for tweaks to customize your game's
 # Target Game Version: v45
 
 # Requirements
-- It's a good idea for everyone that will join your lobby to have this mod installed as well and have the same version. Not having the mod and joining someone who does, might result in unexpected behaviour and bugs.
+- It's a good idea for everyone that will join your lobby to have this mod installed as well and have the same version. Not having the mod and joining someone who does, might result in unexpected behaviour and bugs, but you are free to do so. Keep in mind that almost none of the features will work if you join someone's lobby that does not have my mod installed. I'm certain it's only the hotkey keybinds that are usable, but switching slots will not be synced to other players.
 - You will need BepinEx to use this mod.
 
 # Compatibility
@@ -17,11 +17,19 @@ Mod for Lethal Company with multiple configs for tweaks to customize your game's
 - (Modifiable) - means that it can still be changed and it will take effect
 
 - The mod auto detects and enters compatibility mode if it sees any of the following mods loaded:
+    - LethalThings:
+      - Does not create extra slots from my mod (Automatically Disabled)
+      - Item Slot keybinds still work, even for the reserved slots (Modifiable)
+      
     - Any ReservedSlot mods:
       - Does not create extra slots from my mod (Automatically Disabled)
-      - Disables flashlight keybind from my mod (Automatically Disabled)
-      - Disables walkietalkie keybind from my mod (Automatically Disabled)
       - Item Slot keybinds still work, even for the reserved slots (Modifiable)
+
+    - ReservedFlashlightSlot:
+      - Disables flashlight keybind from my mod (Automatically Disabled)
+
+    - ReservedWalkieSlot:
+      - Disables the WalkieTalkie keybind from my mod (Automatically Disabled)
 
 # These are the default tweaks that are adjustable from the config file:
 ## Info
@@ -74,10 +82,13 @@ Mod for Lethal Company with multiple configs for tweaks to customize your game's
 ## 3. Player Keybinds (Individual)
   - Hotbar slots: 1-9 keyboard keys
   - Emotes: Y and U keys
-  - Push To Talk button can be bound to Mouse buttons now inside the Game's Settings Menu
-  - Flashlight Keybind: F
+  - Flashlight Keybind: F 
   - WalkieTalkie Keybind: R
-## 4. Player Sprint (Synced)
+## 4. Smart Functionality
+  - Using the Flashlight hotkey will find the best flashlight you have in your inventory and cache it for later usage. It will try to find another best flashlight if the cached one is no longer in your inventory anymore, or if it's out of power, or if is a normal flashlight, meaning it will always try to find a pro-flashlight in your inventory if your cached one was a normal one. Priority is as follows: Pro-Flashlight > Normal Flashlight > Higher Battery Charge > Lower Battery Charge
+
+  - Using the WalkieTalkie hotkey will prioritize using the highest battery charge walkie in your inventory that is turned on. It will not automatically turn on another walkie talkie even if it is present in your inventory and it has higher battery charge.
+## 5. Player Sprint (Synced)
   - Sprint Stamina: 15 (was 11)
   - Stamina Drain from jump: 0.04 (was 0.08)
   - Default Sprint Speed value: 1.5 (was 1)
@@ -87,11 +98,11 @@ Mod for Lethal Company with multiple configs for tweaks to customize your game's
   - Stamina Recharge Rate: 5 (was 1)
   - Stamina Recharge Weight while walking: 9 (was 9)
   - Stamina Recharge Weight while standing still: 4 (was 4)
-## 5. Moon Settings (Synced)
+## 6. Moon Settings (Synced)
   - Moon costs can be changed, I've not set a custom cost on them by default, I left them at the vanilla defaults.
-## 6. World Settings (Synced)
+## 7. World Settings (Synced)
   - Time Speed: 0.5 (was 1)
-## 7. Game Rules (Partial)
+## 8. Game Rules (Partial)
   - Allow Flashlight Keybind (allows/disallows using the quick-use Flashlight keybind for everyone): true (vanilla: false) (Synced)
 
   - Allow WalkieTalkie Keybind (allows/disallows using the quick-use Flashlight keybind for everyone): true (vanilla: false) (Synced)
@@ -118,5 +129,4 @@ Mod for Lethal Company with multiple configs for tweaks to customize your game's
 
  # Known Issues
  - Going past 7 slots (i.e ExtraSlotsAmount = 3 in the config) is generally not a good idea as the slots will go off screen depending on your resolution. Will look into providing better support for this in the future.
- - Be careful not to bind your Push To Talk to your main mouse buttons (left, middle, right) because it might remove the binding from the original actions that happen when those are clicked (like clicking on UI elements for example)
  - When terminal use for clients is disabled, when you go in and out of the terminal as a host your currently equipped item's model will be hidden for everyone else but you, until you reselect that item.

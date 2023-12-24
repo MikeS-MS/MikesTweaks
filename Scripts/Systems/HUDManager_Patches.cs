@@ -19,7 +19,7 @@ namespace MikesTweaks.Scripts.Systems
         {
             if (!NetworkManager.Singleton.IsServer)
                 return;
-            if (MikesTweaks.Compatibility.ReservedSlotsCompat)
+            if (MikesTweaks.Compatibility.ReservedSlotCoreCompat || MikesTweaks.Compatibility.LethalThingsCompat)
                 return;
 
             InventoryTweaks.ChangeItemSlotsAmountUI();
