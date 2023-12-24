@@ -1,3 +1,7 @@
+# Version 2.0.1
+**Changed**
+ - Fixed styling issue in CHANGELOG
+
 # Version 2.0 - The Smart Update
 **Added**
  - Smart Flashlight Use with the hotkey, which caches the best flashlight and uses it until it cannot anymore (either no charge left, not in inventory or doesn't exist). The priority is as follows Pro-Flashlight > Normal Flashlight then Higher Battery Charge > Lower Battery Charge
