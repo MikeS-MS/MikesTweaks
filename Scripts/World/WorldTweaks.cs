@@ -28,11 +28,11 @@ namespace MikesTweaks.Scripts.World
 
             public static ConfigEntrySettings<bool> AllowFlashlightKeybind =
                 new ConfigEntrySettings<bool>("AllowFlashlightKeybind", true, false,
-                    "Set this to false if you don't want people who join your lobby to be able to use the flashlight keybind and to true if you want them to be able to.");
+                    "Set this to false if you don't want people who join your lobby to be able to use the Flashlight keybind and to true if you want them to be able to.");
 
             public static ConfigEntrySettings<bool> AllowWalkieTalkieKeybind =
                 new ConfigEntrySettings<bool>("AllowWalkieTalkieKeybind", true, false,
-                    "Set this to false if you don't want people who join your lobby to be able to use the flashlight keybind and to true if you want them to be able to.");
+                    "Set this to false if you don't want people who join your lobby to be able to use the WalkieTalkie keybind and to true if you want them to be able to.");
 
             public static ConfigEntrySettings<bool> AllowClientsToUseTerminal =
                 new ConfigEntrySettings<bool>("AllowClientsToUseTerminal", true, true,

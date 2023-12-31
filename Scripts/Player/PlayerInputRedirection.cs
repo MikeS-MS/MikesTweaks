@@ -217,13 +217,13 @@ namespace MikesTweaks.Scripts.Player
         private void UseSelectedFlashlight(ref FlashlightItem Flashlight, ref FieldInfo timeSinceSwitchingSlots)
         {
             bool pocketed = Flashlight.isPocketed;
-            Flashlight.playerHeldBy.ChangeHelmetLight(Flashlight.flashlightTypeID);
             Flashlight.UseItemOnClient();
             timeSinceSwitchingSlots.SetValue(owner, 0f);
             FlashlightToStop = Flashlight;
             if (!pocketed)
                 return;
 
+            Flashlight.playerHeldBy.ChangeHelmetLight(Flashlight.flashlightTypeID, Flashlight.isBeingUsed);
             Flashlight.PocketItem();
         }
 
@@ -257,11 +257,6 @@ namespace MikesTweaks.Scripts.Player
                 }
             }
 
-            /* TODO: 
-             * Prioritize Pro flashlights over normal flashlights
-             * Ignore laser pointers
-             * Prioritize flashlights with batteries
-             */
             FlashlightItem BestFlashlight = null;
             List<FlashlightItem> ProFlashlights = new List<FlashlightItem>();
             List<FlashlightItem> NormalFlashlights = new List<FlashlightItem>();
@@ -338,7 +333,6 @@ namespace MikesTweaks.Scripts.Player
             if ((float)timeSinceSwitchingSlots.GetValue(owner) < 0.075f)
                 return;
 
-            // TODO: Prioritize WalkieTalkies with batteries
             WalkieTalkie BestWalkieTalkie = null;
             List<WalkieTalkie> WalkieTalkieList = new List<WalkieTalkie>();
             foreach (GrabbableObject item in owner.ItemSlots)
@@ -348,7 +342,6 @@ namespace MikesTweaks.Scripts.Player
                 if (BestWalkieTalkie == null)
                     continue;
                 WalkieTalkieList.Add(BestWalkieTalkie);
-                return;
             }
 
             BestWalkieTalkie = null;

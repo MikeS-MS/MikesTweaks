@@ -17,6 +17,10 @@ Mod for Lethal Company with multiple configs for tweaks to customize your game's
 - (Modifiable) - means that it can still be changed and it will take effect
 
 - The mod auto detects and enters compatibility mode if it sees any of the following mods loaded:
+    - LateGameUpgrades:
+      - Stamina recharge values will not get applied (Automatically Disabled)
+      - Jump stamina drain will not be applied (Automatically Disabled)
+      
     - LethalThings:
       - Does not create extra slots from my mod (Automatically Disabled)
       - Item Slot keybinds still work, even for the reserved slots (Modifiable)

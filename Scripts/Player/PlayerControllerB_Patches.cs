@@ -200,6 +200,9 @@ namespace MikesTweaks.Scripts.Player
         [HarmonyTranspiler]
         private static IEnumerable<CodeInstruction> LateUpdate_Transpiler(IEnumerable<CodeInstruction> instructions)
         {
+            if (MikesTweaks.Compatibility.LateGameUpgradesCompat)
+                return instructions;
+
             bool HinderedWalkingDone = false;
             bool NotHinderedWalkingDone = false;
             bool NotHinderedNotWalkingDone = false;
@@ -232,6 +235,9 @@ namespace MikesTweaks.Scripts.Player
         [HarmonyTranspiler]
         private static IEnumerable<CodeInstruction> ModifyJumpDrain(IEnumerable<CodeInstruction> instructions)
         {
+            if (MikesTweaks.Compatibility.LateGameUpgradesCompat)
+                return instructions;
+
             float JumpDrainValue = 0.08f;
 
             List<CodeInstruction> toListInstructions = new List<CodeInstruction>(instructions);
@@ -252,7 +258,7 @@ namespace MikesTweaks.Scripts.Player
                 break;
             }
 
-            return instructions.AsEnumerable();
+            return toListInstructions.AsEnumerable();
         }
 
         [HarmonyPatch("Emote1_performed")]

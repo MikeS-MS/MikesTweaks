@@ -1,3 +1,13 @@
+# Version 2.0.2
+**Added**
+ - Compatibility mode for LateGameUpgrades that automatically disables my stamina recharge values and jump stamina drain value
+
+**Changed**
+ - Fixed a bug where using flashlight while it was on screen would toggle both the pocketed light and the light coming from the flashlight itself
+ - Fixed a bug where the walkie talkie button would not work
+ - Fixed a bug where jump stamina drain would never be applied
+ - Fixed typo in config description for the walkie-talkie use game rule
+
 # Version 2.0.1
 **Changed**
  - Fixed styling issue in CHANGELOG

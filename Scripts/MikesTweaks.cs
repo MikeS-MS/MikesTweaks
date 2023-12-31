@@ -41,6 +41,7 @@ namespace MikesTweaks.Scripts
             public static bool ReservedSlotsWalkieCompat = false;
             public static bool ReservedSlotsFlashlightCompat = false;
             public static bool LethalThingsCompat = false;
+            public static bool LateGameUpgradesCompat = false;
         }
 
         public void BindConfig<T>(ref ConfigEntrySettings<T> config, string SectionName)
@@ -63,19 +64,19 @@ namespace MikesTweaks.Scripts
             PlayerTweaks.RegisterConfigs();
             InventoryTweaks.RegisterConfigs();
             Config.SaveOnConfigSet = false;
-            
-            Harmony.CreateAndPatchAll(typeof(MenuManager_Patches));
-            //Harmony.CreateAndPatchAll(typeof(IngamePlayerSettings_Patches));
-            Harmony.CreateAndPatchAll(typeof(HUDManager_Patches));
-            Harmony.CreateAndPatchAll(typeof(NetworkManager_Patches));
-            Harmony.CreateAndPatchAll(typeof(StartOfRound_Patches));
-            Harmony.CreateAndPatchAll(typeof(TimeOfDay_Patches));
-            Harmony.CreateAndPatchAll(typeof(InteractTrigger_Patches));
-            Harmony.CreateAndPatchAll(typeof(Terminal_Patches));
-            Harmony.CreateAndPatchAll(typeof(PlayerControllerB_Patches));
-            Harmony.CreateAndPatchAll(typeof(GrabbableObject_Patches));
-
             CheckCompatibilities();
+            Harmony harmony = new Harmony(GUID);
+            harmony.PatchAll(typeof(MenuManager_Patches));
+            //harmony.PatchAll(typeof(IngamePlayerSettings_Patches));
+            harmony.PatchAll(typeof(HUDManager_Patches));
+            harmony.PatchAll(typeof(NetworkManager_Patches));
+            harmony.PatchAll(typeof(StartOfRound_Patches));
+            harmony.PatchAll(typeof(TimeOfDay_Patches));
+            harmony.PatchAll(typeof(InteractTrigger_Patches));
+            harmony.PatchAll(typeof(Terminal_Patches));
+            harmony.PatchAll(typeof(PlayerControllerB_Patches));
+            harmony.PatchAll(typeof(GrabbableObject_Patches));
+
 
             Logger.LogInfo($"Plugin {GUID} is loaded!");
         }
@@ -83,24 +84,10 @@ namespace MikesTweaks.Scripts
         private void CheckCompatibilities()
         {
             Compatibility.ReservedSlotCoreCompat = IsModPresent("FlipMods.ReservedItemSlotCore");
-
-            if (Compatibility.ReservedSlotCoreCompat)
-                Log.LogInfo("Found: ReservedItemSlotCore");
-
             Compatibility.ReservedSlotsWalkieCompat = IsModPresent("FlipMods.ReservedWalkieSlot");
-            
-            if (Compatibility.ReservedSlotsWalkieCompat)
-                Log.LogInfo("Found: ReservedWalkieSlot");
-
             Compatibility.ReservedSlotsFlashlightCompat = IsModPresent("FlipMods.ReservedFlashlightSlot");
-
-            if (Compatibility.ReservedSlotsFlashlightCompat)
-                Log.LogInfo("Found: ReservedFlashlightSlot");
-
             Compatibility.LethalThingsCompat = IsModPresent("evaisa.lethalthings");
-
-            if (Compatibility.LethalThingsCompat)
-                Log.LogInfo("Found: LethalThings");
+            Compatibility.LateGameUpgradesCompat = IsModPresent("com.malco.lethalcompany.moreshipupgrades");
         }
 
         public static bool IsModPresent(string name)
@@ -108,7 +95,10 @@ namespace MikesTweaks.Scripts
             foreach (var pluginInfo in Chainloader.PluginInfos)
             {
                 if (name == pluginInfo.Value.Metadata.GUID)
+                {
+                    Log.LogInfo($"Found: {pluginInfo.Value.Metadata.Name}");
                     return true;
+                }
             }
 
             return false;
