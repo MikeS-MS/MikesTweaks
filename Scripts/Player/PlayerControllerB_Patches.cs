@@ -282,25 +282,6 @@ namespace MikesTweaks.Scripts.Player
             WorldTweaks.MakeTerminalUnusableForAnyoneButHost();
         }
 
-        [HarmonyPatch("OnEnable")]
-        [HarmonyPostfix]
-        private static void OnEnable(PlayerControllerB __instance)
-        {
-            if (!PlayerTweaks.IsLocallyControlled(__instance))
-                return;
-
-            inputRedirection?.OnEnable();
-        }
-
-        [HarmonyPatch("OnDisable")]
-        [HarmonyPostfix]
-        private static void OnDisable(PlayerControllerB __instance)
-        {
-            if (!PlayerTweaks.IsLocallyControlled(__instance))
-                return;
-            inputRedirection?.OnDisable();
-        }
-
         [HarmonyPatch("OnDestroy")]
         [HarmonyPrefix]
         public static void OnDestroy(PlayerControllerB __instance)

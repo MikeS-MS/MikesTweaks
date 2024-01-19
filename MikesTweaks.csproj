@@ -23,56 +23,56 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>E:\Games\SteamLibrary\steamapps\common\Lethal Company\BepInEx\core\0Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>E:\Games\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx">
-      <HintPath>E:\Games\SteamLibrary\steamapps\common\Lethal Company\BepInEx\core\BepInEx.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx.Harmony">
-      <HintPath>C:\Users\mikes\AppData\Roaming\r2modmanPlus-local\LethalCompany\profiles\Default\BepInEx\core\BepInEx.Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx.Preloader">
-      <HintPath>C:\Users\mikes\AppData\Roaming\r2modmanPlus-local\LethalCompany\profiles\Default\BepInEx\core\BepInEx.Preloader.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>E:\Games\SteamLibrary\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Mdb">
-      <HintPath>E:\Games\SteamLibrary\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Mdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Pdb">
-      <HintPath>E:\Games\SteamLibrary\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Pdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Rocks">
-      <HintPath>E:\Games\SteamLibrary\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Rocks.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoMod.RuntimeDetour">
-      <HintPath>E:\Games\SteamLibrary\steamapps\common\Lethal Company\BepInEx\core\MonoMod.RuntimeDetour.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoMod.Utils">
-      <HintPath>E:\Games\SteamLibrary\steamapps\common\Lethal Company\BepInEx\core\MonoMod.Utils.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Collections">
-      <HintPath>E:\Games\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Collections.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.InputSystem">
-      <HintPath>E:\Games\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.InputSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Netcode.Runtime">
-      <HintPath>E:\Games\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>E:\Games\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>E:\Games\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>E:\Games\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.UI.dll</HintPath>
-    </Reference>
+	  <Reference Include="LethalCompanyInputUtils">
+		  <HintPath>..\bepinexdeps\LethalCompanyInputUtils.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Assembly-CSharp">
+		  <HintPath>..\bepinexdeps\Lethal Company_Data\Managed\Assembly-CSharp.dll</HintPath>
+	  </Reference>
+	  <Reference Include="BepInEx">
+		  <HintPath>..\bepinexdeps\BepInEx\core\BepInEx.dll</HintPath>
+	  </Reference>
+	  <Reference Include="BepInEx.Harmony">
+		  <HintPath>..\bepinexdeps\BepInEx\core\BepInEx.Harmony.dll</HintPath>
+	  </Reference>
+	  <Reference Include="BepInEx.Preloader">
+		  <HintPath>..\bepinexdeps\BepInEx\core\BepInEx.Preloader.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Mono.Cecil">
+		  <HintPath>..\bepinexdeps\BepInEx\core\Mono.Cecil.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Mono.Cecil.Mdb">
+		  <HintPath>..\bepinexdeps\BepInEx\core\Mono.Cecil.Mdb.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Mono.Cecil.Pdb">
+		  <HintPath>..\bepinexdeps\BepInEx\core\Mono.Cecil.Pdb.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Mono.Cecil.Rocks">
+		  <HintPath>..\bepinexdeps\BepInEx\core\Mono.Cecil.Rocks.dll</HintPath>
+	  </Reference>
+	  <Reference Include="MonoMod.RuntimeDetour">
+		  <HintPath>..\bepinexdeps\BepInEx\core\MonoMod.RuntimeDetour.dll</HintPath>
+	  </Reference>
+	  <Reference Include="MonoMod.Utils">
+		  <HintPath>..\bepinexdeps\BepInEx\core\MonoMod.Utils.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Unity.Collections">
+		  <HintPath>..\bepinexdeps\Lethal Company_Data\Managed\Unity.Collections.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Unity.InputSystem">
+		  <HintPath>..\bepinexdeps\Lethal Company_Data\Managed\Unity.InputSystem.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Unity.Netcode.Runtime">
+		  <HintPath>..\bepinexdeps\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
+	  </Reference>
+	  <Reference Include="UnityEngine">
+		  <HintPath>..\bepinexdeps\Lethal Company_Data\Managed\UnityEngine.dll</HintPath>
+	  </Reference>
+	  <Reference Include="UnityEngine.CoreModule">
+		  <HintPath>..\bepinexdeps\Lethal Company_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+	  </Reference>
+	  <Reference Include="UnityEngine.UI">
+		  <HintPath>..\bepinexdeps\Lethal Company_Data\Managed\UnityEngine.UI.dll</HintPath>
+	  </Reference>
   </ItemGroup>
 </Project>

@@ -24,41 +24,26 @@ namespace MikesTweaks.Scripts.Player
 
         public void OnHotbar1(InputAction.CallbackContext context)
         {
-            if (context.phase != InputActionPhase.Performed)
-                return;
-
             RequestSlotChange(0);
         }
 
         public void OnHotbar2(InputAction.CallbackContext context)
         {
-            if (context.phase != InputActionPhase.Performed)
-                return;
-
             RequestSlotChange(1);
         }
 
         public void OnHotbar3(InputAction.CallbackContext context)
         {
-            if (context.phase != InputActionPhase.Performed)
-                return;
-
             RequestSlotChange(2);
         }
 
         public void OnHotbar4(InputAction.CallbackContext context)
         {
-            if (context.phase != InputActionPhase.Performed)
-                return;
-
             RequestSlotChange(3);
         }
 
         public void OnHotbar5(InputAction.CallbackContext context)
         {
-            if (context.phase != InputActionPhase.Performed)
-                return;
-
             if (!InventoryTweaks.HasEnoughSlots(4))
                 return;
 
@@ -67,9 +52,6 @@ namespace MikesTweaks.Scripts.Player
 
         public void OnHotbar6(InputAction.CallbackContext context)
         {
-            if (context.phase != InputActionPhase.Performed)
-                return;
-
             if (!InventoryTweaks.HasEnoughSlots(5))
                 return;
 
@@ -78,9 +60,6 @@ namespace MikesTweaks.Scripts.Player
 
         public void OnHotbar7(InputAction.CallbackContext context)
         {
-            if (context.phase != InputActionPhase.Performed)
-                return;
-
             if (!InventoryTweaks.HasEnoughSlots(6))
                 return;
 
@@ -89,9 +68,6 @@ namespace MikesTweaks.Scripts.Player
 
         public void OnHotbar8(InputAction.CallbackContext context)
         {
-            if (context.phase != InputActionPhase.Performed)
-                return;
-
             if (!InventoryTweaks.HasEnoughSlots(7))
                 return;
 
@@ -100,9 +76,6 @@ namespace MikesTweaks.Scripts.Player
 
         public void OnHotbar9(InputAction.CallbackContext context)
         {
-            if (context.phase != InputActionPhase.Performed)
-                return;
-
             if (!InventoryTweaks.HasEnoughSlots(8))
                 return;
 
@@ -144,16 +117,6 @@ namespace MikesTweaks.Scripts.Player
             }
         }
 
-        public void OnEnable()
-        {
-            input?.Enable();
-        }
-
-        public void OnDisable()
-        {
-            input?.Disable();
-        }
-
         public void Destroy()
         {
             input?.Dispose();
@@ -166,37 +129,10 @@ namespace MikesTweaks.Scripts.Player
             input.Hotbar.SetCallbacks(this);
             input.Emotes.SetCallbacks(this);
             input.Actions.SetCallbacks(this);
-            input.Enable();
-
-            SetupKeybinds();
         }
 
         public void SetupKeybinds()
         {
-            input.Hotbar.Hotbar1.ChangeBinding(0).WithPath(PlayerTweaks.Configs.SlotKeybinds[0].Value());
-
-            input.Hotbar.Hotbar2.ChangeBinding(0).WithPath(PlayerTweaks.Configs.SlotKeybinds[1].Value());
-
-            input.Hotbar.Hotbar3.ChangeBinding(0).WithPath(PlayerTweaks.Configs.SlotKeybinds[2].Value());
-
-            input.Hotbar.Hotbar4.ChangeBinding(0).WithPath(PlayerTweaks.Configs.SlotKeybinds[3].Value());
-
-            input.Hotbar.Hotbar5.ChangeBinding(0).WithPath(PlayerTweaks.Configs.SlotKeybinds[4].Value());
-
-            input.Hotbar.Hotbar6.ChangeBinding(0).WithPath(PlayerTweaks.Configs.SlotKeybinds[5].Value());
-
-            input.Hotbar.Hotbar7.ChangeBinding(0).WithPath(PlayerTweaks.Configs.SlotKeybinds[6].Value());
-
-            input.Hotbar.Hotbar8.ChangeBinding(0).WithPath(PlayerTweaks.Configs.SlotKeybinds[7].Value());
-
-            input.Hotbar.Hotbar9.ChangeBinding(0).WithPath(PlayerTweaks.Configs.SlotKeybinds[8].Value());
-
-            input.Emotes.Emote1.ChangeBinding(0).WithPath(PlayerTweaks.Configs.EmoteKeybinds[0].Value());
-
-            input.Emotes.Emote2.ChangeBinding(0).WithPath(PlayerTweaks.Configs.EmoteKeybinds[1].Value());
-
-            input.Actions.FlashlightToggle.ChangeBinding(0).WithPath(PlayerTweaks.Configs.FlashlightKeybind.Value());
-            input.Actions.WalkieTalkieSpeak.ChangeBinding(0).WithPath(PlayerTweaks.Configs.WalkieTalkieKeybind.Value());
         }
 
         private void FindBestFlashlight(ref FlashlightItem BestFlashlight, ref List<FlashlightItem> Flashlights)
