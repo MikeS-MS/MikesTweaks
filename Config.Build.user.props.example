@@ -1,0 +1,15 @@
+<Project>
+  <!--
+    Optional local overrides. Copy this file to Config.Build.user.props (gitignored).
+
+    Point LethalCompanyDir at the folder that contains Lethal Company.exe.
+    BepInEx next to the game, or in an r2modman/Thunderstore profile, is picked up on its own.
+    Set BepInExCore only when it lives somewhere else.
+
+    Environment variables LETHAL_COMPANY_DIR and BEPINEX_CORE do the same thing.
+  -->
+  <PropertyGroup>
+    <!-- <LethalCompanyDir></LethalCompanyDir> -->
+    <!-- <BepInExCore></BepInExCore> -->
+  </PropertyGroup>
+</Project>

@@ -3,3 +3,6 @@
 *.user
 /.vs
 /.git
+
+# Local game and BepInEx paths (copy from Config.Build.user.props.example)
+Config.Build.user.props

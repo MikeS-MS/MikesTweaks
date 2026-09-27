@@ -1,0 +1,12 @@
+<Project>
+  <Target Name="EnsureLethalCompanyReferences" BeforeTargets="ResolveAssemblyReferences">
+    <Error
+      Text="Lethal Company was not found. Install it through Steam, set LETHAL_COMPANY_DIR to the folder that contains Lethal Company.exe, or copy Config.Build.user.props.example to Config.Build.user.props and set LethalCompanyDir."
+      Condition="!Exists('$(GameManaged)Assembly-CSharp.dll')"
+    />
+    <Error
+      Text="BepInEx was not found (missing 0Harmony.dll). Install BepInEx in the game folder or in an r2modman profile, set BEPINEX_CORE, or set BepInExCore in Config.Build.user.props."
+      Condition="!Exists('$(BepInExCore)0Harmony.dll')"
+    />
+  </Target>
+</Project>

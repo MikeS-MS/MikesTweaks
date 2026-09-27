@@ -30,58 +30,106 @@ namespace MikesTweaks.Scripts.Player
             inputRedirection.InitializeKeybinds();
         }
 
-        private static bool InsertStaminaRechargeMovementHinderedWalking(ref List<CodeInstruction> instructions, CodeInstruction instruction, int i, ref List<int> IndexesToRemove)
+        private static bool IsLdarg0(CodeInstruction instruction) => instruction.opcode == OpCodes.Ldarg_0;
+
+        private static bool IsLdloc(CodeInstruction instruction)
         {
-            if (instruction.opcode != OpCodes.Ldc_R4)
+            return instruction.opcode == OpCodes.Ldloc
+                || instruction.opcode == OpCodes.Ldloc_S
+                || instruction.opcode == OpCodes.Ldloc_0
+                || instruction.opcode == OpCodes.Ldloc_1
+                || instruction.opcode == OpCodes.Ldloc_2
+                || instruction.opcode == OpCodes.Ldloc_3;
+        }
+
+        private static bool IsSprintMeterField(CodeInstruction instruction, OpCode opcode)
+        {
+            return instruction.opcode == opcode && instruction.operand is FieldInfo field && field.Name == nameof(PlayerControllerB.sprintMeter);
+        }
+
+        private static bool TryReadFloat(CodeInstruction instruction, out float value)
+        {
+            value = 0f;
+            if (instruction.opcode != OpCodes.Ldc_R4 || !(instruction.operand is float constant))
                 return false;
 
-            if (Math.Abs((float)instruction.operand - 0.5f) > 0.01f)
-                return false;
-
-            instructions[i - 7] = new CodeInstruction(OpCodes.Ldloc_0);
-            instructions[i - 6] = CodeInstruction.Call(typeof(PlayerTweaks), nameof(PlayerTweaks.StaminaRechargeMovementHinderedWalking));
-            instructions[i - 5] = CodeInstruction.StoreField(typeof(PlayerControllerB), nameof(PlayerControllerB.sprintMeter));
-
-            for (int j = i - 4; j <= i + 6; j++)
-                IndexesToRemove.Add(j);
-
+            value = constant;
             return true;
         }
 
-        private static bool InsertStaminaRechargeMovementNotHinderedWalking(ref List<CodeInstruction> instructions, CodeInstruction instruction, int i, ref List<int> IndexesToRemove)
+        private static void MoveMarks(CodeInstruction from, CodeInstruction to)
         {
-            if (instruction.opcode != OpCodes.Ldc_R4)
-                return false;
+            if (from.labels != null && from.labels.Count > 0)
+            {
+                to.labels.AddRange(from.labels);
+                from.labels.Clear();
+            }
 
-            if (Math.Abs((float)instruction.operand - 9f) > 0.01f)
-                return false;
-
-            instructions[i - 4] = new CodeInstruction(OpCodes.Ldloc_0);
-            instructions[i - 3] = CodeInstruction.Call(typeof(PlayerTweaks), nameof(PlayerTweaks.StaminaRechargeMovementNotHinderedWalking));
-            instructions[i - 2] = CodeInstruction.StoreField(typeof(PlayerControllerB), nameof(PlayerControllerB.sprintMeter));
-
-            for (int j = i - 1; j <= i + 9; j++)
-                IndexesToRemove.Add(j);
-
-            return true;
+            if (from.blocks != null && from.blocks.Count > 0)
+            {
+                to.blocks.AddRange(from.blocks);
+                from.blocks.Clear();
+            }
         }
 
-        private static bool InsertStaminaRechargeMovementNotHinderedNotWalking(ref List<CodeInstruction> instructions, CodeInstruction instruction, int i, ref List<int> IndexesToRemove)
+        // The recharge sites are Mathf.Clamp assignments into sprintMeter.
+        // Hindered walking multiplies by 0.5, standing still adds 4, walking adds 9.
+        // The float multiplied in is whatever local the game uses for that factor, not local 0.
+        private static bool TryGetStaminaRechargeReplacement(List<CodeInstruction> instructions, int end, out int start, out CodeInstruction localLoad, out MethodInfo replacement)
         {
-            if (instruction.opcode != OpCodes.Ldc_R4)
+            start = -1;
+            localLoad = null;
+            replacement = null;
+
+            int windowStart = Math.Max(0, end - 30);
+            for (int i = end - 3; i >= windowStart; i--)
+            {
+                if (IsLdarg0(instructions[i]) && IsLdarg0(instructions[i + 1]) && IsSprintMeterField(instructions[i + 2], OpCodes.Ldfld))
+                {
+                    start = i;
+                    break;
+                }
+            }
+
+            if (start < 0)
                 return false;
 
-            if (Math.Abs((float)instruction.operand - 4f) > 0.01f)
+            bool sawClamp = false;
+            float? matchedConstant = null;
+            for (int i = start; i <= end; i++)
+            {
+                CodeInstruction instruction = instructions[i];
+                if (instruction.opcode == OpCodes.Call && instruction.operand is MethodInfo method && method.Name == nameof(Mathf.Clamp))
+                    sawClamp = true;
+
+                if (IsLdloc(instruction))
+                    localLoad = instruction;
+
+                if (TryReadFloat(instruction, out float constant))
+                {
+                    if (Math.Abs(constant - 0.5f) <= 0.01f || Math.Abs(constant - 4f) <= 0.01f || Math.Abs(constant - 9f) <= 0.01f)
+                    {
+                        if (matchedConstant != null)
+                            return false;
+
+                        matchedConstant = constant;
+                    }
+                }
+            }
+
+            if (!sawClamp || localLoad == null || matchedConstant == null)
                 return false;
 
-            instructions[i - 4] = new CodeInstruction(OpCodes.Ldloc_0);
-            instructions[i - 3] = CodeInstruction.Call(typeof(PlayerTweaks), nameof(PlayerTweaks.StaminaRechargeMovementNotHinderedNotWalking));
-            instructions[i - 2] = CodeInstruction.StoreField(typeof(PlayerControllerB), nameof(PlayerControllerB.sprintMeter));
+            string helperName;
+            if (Math.Abs(matchedConstant.Value - 0.5f) <= 0.01f)
+                helperName = nameof(PlayerTweaks.StaminaRechargeMovementHinderedWalking);
+            else if (Math.Abs(matchedConstant.Value - 4f) <= 0.01f)
+                helperName = nameof(PlayerTweaks.StaminaRechargeMovementNotHinderedNotWalking);
+            else
+                helperName = nameof(PlayerTweaks.StaminaRechargeMovementNotHinderedWalking);
 
-            for (int j = i - 1; j <= i + 9; j++)
-                IndexesToRemove.Add(j);
-
-            return true;
+            replacement = AccessTools.Method(typeof(PlayerTweaks), helperName, new[] { typeof(PlayerControllerB), typeof(float) });
+            return replacement != null;
         }
 
         [HarmonyPatch("Awake")]
@@ -203,30 +251,37 @@ namespace MikesTweaks.Scripts.Player
             if (MikesTweaks.Compatibility.LateGameUpgradesCompat)
                 return instructions;
 
-            bool HinderedWalkingDone = false;
-            bool NotHinderedWalkingDone = false;
-            bool NotHinderedNotWalkingDone = false;
-
-            List<int> IndexesToRemove = new List<int>();
             List<CodeInstruction> instructionsToList = new List<CodeInstruction>(instructions);
-            for (int i = 0; i < instructionsToList.Count; i++)
+            int patched = 0;
+            for (int end = 0; end < instructionsToList.Count; end++)
             {
-                var instruction = instructionsToList[i];
+                if (!IsSprintMeterField(instructionsToList[end], OpCodes.Stfld))
+                    continue;
 
-                if (!HinderedWalkingDone)
-                    HinderedWalkingDone = InsertStaminaRechargeMovementHinderedWalking(ref instructionsToList, instruction, i, ref IndexesToRemove);
-                if (!NotHinderedNotWalkingDone)
-                    NotHinderedNotWalkingDone = InsertStaminaRechargeMovementNotHinderedNotWalking(ref instructionsToList, instruction, i, ref IndexesToRemove);
-                if (!NotHinderedWalkingDone)
-                    NotHinderedWalkingDone = InsertStaminaRechargeMovementNotHinderedWalking(ref instructionsToList, instruction, i, ref IndexesToRemove);
+                if (!TryGetStaminaRechargeReplacement(instructionsToList, end, out int start, out CodeInstruction localLoad, out MethodInfo replacement))
+                    continue;
 
-                if (HinderedWalkingDone && NotHinderedNotWalkingDone && NotHinderedWalkingDone)
-                    break;
+                CodeInstruction storeTarget = new CodeInstruction(OpCodes.Ldarg_0);
+                for (int i = start; i <= end; i++)
+                    MoveMarks(instructionsToList[i], storeTarget);
+
+                List<CodeInstruction> rewritten = new List<CodeInstruction>
+                {
+                    storeTarget,
+                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new CodeInstruction(localLoad.opcode, localLoad.operand),
+                    new CodeInstruction(OpCodes.Call, replacement),
+                    CodeInstruction.StoreField(typeof(PlayerControllerB), nameof(PlayerControllerB.sprintMeter))
+                };
+
+                instructionsToList.RemoveRange(start, end - start + 1);
+                instructionsToList.InsertRange(start, rewritten);
+                end = start + rewritten.Count - 1;
+                patched++;
             }
 
-            IndexesToRemove.Sort();
-            for (int i = IndexesToRemove.Count - 1; i >= 0; i--)
-                instructionsToList.RemoveAt(IndexesToRemove[i]);
+            if (patched != 3)
+                MikesTweaks.Log?.LogWarning($"LateUpdate stamina recharge patch matched {patched} sites (expected 3). Unmatched sites keep vanilla behavior.");
 
             return instructionsToList.AsEnumerable();
         }

@@ -1,0 +1,33 @@
+<Project>
+  <!--
+    Local overrides: copy Config.Build.user.props.example to Config.Build.user.props (gitignored).
+    Imported first so an explicit path wins over auto-detection.
+  -->
+  <Import
+    Project="$(MSBuildThisFileDirectory)Config.Build.user.props"
+    Condition="Exists('$(MSBuildThisFileDirectory)Config.Build.user.props')"
+  />
+
+  <PropertyGroup>
+    <LethalCompanyDir Condition="'$(LethalCompanyDir)' == '' and '$(LETHAL_COMPANY_DIR)' != ''">$(LETHAL_COMPANY_DIR)</LethalCompanyDir>
+    <BepInExCore Condition="'$(BepInExCore)' == '' and '$(BEPINEX_CORE)' != ''">$(BEPINEX_CORE)</BepInExCore>
+
+    <LethalCompanyDir Condition="'$(LethalCompanyDir)' != ''">$([MSBuild]::EnsureTrailingSlash($(LethalCompanyDir)))</LethalCompanyDir>
+    <GameManaged Condition="'$(LethalCompanyDir)' != ''">$(LethalCompanyDir)Lethal Company_Data\Managed\</GameManaged>
+
+    <BepInExCore Condition="'$(BepInExCore)' == '' and Exists('$(LethalCompanyDir)BepInEx\core\0Harmony.dll')">$(LethalCompanyDir)BepInEx\core\</BepInExCore>
+  </PropertyGroup>
+
+  <!-- r2modman / Thunderstore profiles, when BepInEx is not installed into the game folder. -->
+  <PropertyGroup>
+    <_HarmonyList Condition="'$(BepInExCore)' == '' and Exists('$(APPDATA)\r2modmanPlus-local\LethalCompany\profiles')">$([System.IO.Directory]::GetFiles('$(APPDATA)\r2modmanPlus-local\LethalCompany\profiles', '0Harmony.dll', System.IO.SearchOption.AllDirectories))</_HarmonyList>
+    <_HarmonyList Condition="'$(BepInExCore)' == '' and '$(_HarmonyList)' == '' and Exists('$(APPDATA)\r2modmanPlus\LethalCompany\profiles')">$([System.IO.Directory]::GetFiles('$(APPDATA)\r2modmanPlus\LethalCompany\profiles', '0Harmony.dll', System.IO.SearchOption.AllDirectories))</_HarmonyList>
+    <_HarmonyList Condition="'$(BepInExCore)' == '' and '$(_HarmonyList)' == '' and Exists('$(APPDATA)\Thunderstore Mod Manager\DataFolder\LethalCompany\profiles')">$([System.IO.Directory]::GetFiles('$(APPDATA)\Thunderstore Mod Manager\DataFolder\LethalCompany\profiles', '0Harmony.dll', System.IO.SearchOption.AllDirectories))</_HarmonyList>
+    <_HarmonyList Condition="'$(BepInExCore)' == '' and '$(_HarmonyList)' == '' and Exists('$(HOME)/.config/r2modmanPlus-local/LethalCompany/profiles')">$([System.IO.Directory]::GetFiles('$(HOME)/.config/r2modmanPlus-local/LethalCompany/profiles', '0Harmony.dll', System.IO.SearchOption.AllDirectories))</_HarmonyList>
+    <BepInExCore Condition="'$(BepInExCore)' == '' and '$(_HarmonyList)' != ''">$([System.IO.Path]::GetDirectoryName('$(_HarmonyList.Split(`;`)[0])'))\</BepInExCore>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(BepInExCore)' != ''">
+    <BepInExCore>$([MSBuild]::EnsureTrailingSlash($(BepInExCore)))</BepInExCore>
+  </PropertyGroup>
+</Project>
